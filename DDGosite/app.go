@@ -44,8 +44,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 	// recieve Username and password from login form as input
 	// connect to database and check to see if username exist 
 	// if username exists then run HashPassword() func on the input password
-	// if the Hash of the input password Matches the password Hash stored under that username 
-	// Then user input Matches that of database and we Authenticate the user
+	// if the Hash of the input password Matches the Hashed password that is stored in the database 
+	// Then we Authenticate the user
 
 
 	// set user as Authenticated
