@@ -36,6 +36,11 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(data)
 
+	//query username from database
+	//hash password
+	// check if password hash matches database 
+
+
 	tmpl.Execute(w, struct{ Success bool }{true})
 }
 
@@ -61,8 +66,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 func main() {
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
-
-	// need to change so when you click login button it navigates http://localhost:8080/login rather than the actaul source file
 
 	http.HandleFunc("/login", loginPage)
 	http.HandleFunc("/register", Register)
