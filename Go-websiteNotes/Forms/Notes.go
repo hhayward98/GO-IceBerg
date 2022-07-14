@@ -17,7 +17,7 @@ func main() {
 	tmpl := template.Must(template.ParseFiles("forms.html"))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.methodPost {
+		if r.Method != http.MethodPost {
 			tmpl.Execute(w, nil)
 			return
 		}
@@ -33,8 +33,9 @@ func main() {
 
 		_ = details
 
-		tmpl.Execute(W, struct{ Success bool }{true})
+		tmpl.Execute(w, struct{ Success bool }{true})
 	})
 
 	http.ListenAndServe(":8080", nil)
+	// navigate to http://localhost:8080/
 }
