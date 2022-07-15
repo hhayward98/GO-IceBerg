@@ -186,6 +186,9 @@ func secretPage(w http.ResponseWriter, r *http.Request) {
 
 func ToolsPage(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("static/templates/tools.html"))
+	session, _ := store.Get(r, "cookie-name")
+
+
 
 
 	tmpl.Execute(w, nil)
@@ -205,7 +208,7 @@ func main() {
 
 	http.HandleFunc("/logout", logout)
 	http.HandleFunc("/secretPage", secretPage)
-	http.HandleFunc("/ToolsPage", secretPage)
+	http.HandleFunc("/ToolsPage", ToolsPage)
 
 
 	log.Print("Listening....")
