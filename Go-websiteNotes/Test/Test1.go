@@ -61,17 +61,7 @@ import (
 // 	// redirect user to login page
 // }
 
-// /*Password Hashing*/
 
-// func HashPassword(password string) (string, error) {
-// 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 32)
-// 	return string(bytes), err
-// }
-
-// func CheckPasswordHash(password, hash string) bool {
-// 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-// 	return err == nil
-// }
 
 
 // func Index(w http.ResponseWriter, r *http.Request) {
@@ -96,27 +86,28 @@ import (
 
 
 
-/*Main*/
-
 type LoginRequest struct {
 	Username string
 	Password string
 }
 
+
 type RegisterDetails struct {
 	Email string
 	Username string
 	Password string
+	ConfPass string
 }
 
 
-func Template(w http.ResponseWriter, r *http.Request) {
-	h1 := filepath.Join("Templates", "layout.html")
-	h2 := filepath.Join("Templates", filepath.Clean(r.URL.Path))
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 32)
+	return string(bytes), err
+}
 
-	tmpl, _ := template.ParseFiles(h1, h2)
-	tmpl.ExecuteTemplate(w, "layout", nil)
-
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }
 
 func loginPage(w http.ResponseWriter, r *http.Request) {
@@ -128,24 +119,44 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 		Password: r.FormValue("PassWord"),
 
 	}
+	
+	_ = data
+
+	fmt.Println(data)
+
+	//query username from database
+	//hash password
+	// check if password hash matches database 
+
+
+	tmpl.Execute(w, struct{ Success bool }{true})
+}
+
+func Register(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("static/Templates/register.html"))
+
+	data := RegisterDetails{
+		Email: r.FormValue("email"),
+		Username: r.FormValue("UserName"),
+		Password: r.FormValue("PassWord"),
+		ConfPass: r.FormValue("pass2"),
+	}
 
 	_ = data
 
 	fmt.Println(data)
 
 	tmpl.Execute(w, struct{ Success bool }{true})
+
 }
-
-
-
 
 
 func main() {
 	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	http.Handle("/", fs)
 
-	http.HandleFunc("/", Template)
 	http.HandleFunc("/login", loginPage)
+	http.HandleFunc("/register", Register)
 
 	log.Print("Listening....")
 
@@ -153,4 +164,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 }

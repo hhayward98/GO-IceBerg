@@ -170,9 +170,20 @@ section{
 
 .LoginForm {
 	align-content: center;
+
+	padding-top: 200px;
 }
 
 .RegisterForm {
 	align-content: center;
+
+	padding-top: 200px;
+
+
+}
+
+.Intro {
+	padding-top: 200px
+
 
 }
