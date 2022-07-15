@@ -14,7 +14,7 @@ import (
 func main() {
 
 	//connect to database
-	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3306)/DDsql?parseTime=true")
+	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,23 +22,32 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// _, err = db.Exec("CREATE DATABASE demon")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	_, err = db.Exec("USE demon")
+	if err != nil {
+		log.Fatal(err)
+	}
 	// create tables
 
-	{
-		query:= `
-			CREATE TABLE users (
-				id INT AUTO_INCREMENT,
-				username TEXT NOT NULL,
-				password TEXT NOT NULL,
-				email TEXT NOT NULL,
-				created_at DATETIME,
-				PRIMARY KEY (id)
-			);`
+	// {
+	// 	query:= `
+	// 		CREATE TABLE users (
+	// 			id INT AUTO_INCREMENT,
+	// 			username TEXT NOT NULL,
+	// 			password TEXT NOT NULL,
+	// 			email TEXT NOT NULL,
+	// 			created_at DATETIME,
+	// 			PRIMARY KEY (id)
+	// 		);`
 
-		if _, err := db.Exec(query); err != nil {
-			log.Fatal(err)
-		}
-	}
+	// 	if _, err := db.Exec(query); err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }
 
 	// create Admin and insert into database
 	{
@@ -47,7 +56,7 @@ func main() {
 		email := "Admin@boss.com"
 		createdAt := time.Now()
 
-		result, err := db.Exec(`INSERT INTO users (username, password, email, created_at) Values(?, ?, ?)`, username, password, email, createdAt)
+		result, err := db.Exec(`INSERT INTO users (username, password, email, created_at) Values(?, ?, ?, ?)`, username, password, email, createdAt)
 		if err != nil {
 			log.Fatal(err)
 		}

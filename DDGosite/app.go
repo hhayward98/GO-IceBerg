@@ -1,14 +1,15 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"fmt"
 	"html/template"
 	"net/http"
-
+	"time"
 	"golang.org/x/crypto/bcrypt"
 	"github.com/gorilla/sessions"
-
+	_ "github.com/go-sql-driver/mysql"
 
 )
 
@@ -51,43 +52,81 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 
 	session, _ := store.Get(r, "cookie-name")
 
+	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec("USE demon")
+	if err != nil {
+	log.Fatal(err)
+	}
+
 	data := LoginRequest{
 		Username: r.FormValue("UserName"),
 		Password: r.FormValue("PassWord"),
 
 	}
+
+	var (
+		
+		UN string
+		PW string
+		
+	)
 	
 	_ = data
 
 	fmt.Println(data)
 
-	//query username from database
-	// temp name untill I link DB
-	name := "Temp"
-	Pass := "$2a$14$vk9UXe4zniQ/kZJM/INvr.P1LbE6EMjuISqVGxFOk0m4mqU0pp.OS"
+
+	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, data.Username)
+
+	defer userCheck.Close()
 
 
-	// Hpass, _ := HashPassword(data.Password)
+	for userCheck.Next() {
+		err := userCheck.Scan(&UN, &PW)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	}
 
 	// check if password hash matches database 
 
-	Match := CheckPasswordHash(data.Password, Pass)
 
-	if Match == true {
+	// user := userCheck
 
-		session.Values["authenticated"] = true
-		session.Values["User"] = name
-		session.Save(r, w)
+	fmt.Println(UN)
+	fmt.Println(PW)
 
-		// redirect user to secretpage
+	if UN == data.Username {
 
-		tmpl := template.Must(template.ParseFiles("static/Templates/secretPage.html"))
-		tmpl.Execute(w, nil)
-		return
+		Match := CheckPasswordHash(data.Password, PW)
 
-	} else if Match == false {
+		if Match == true {
+
+			session.Values["authenticated"] = true
+			session.Values["User"] = data.Username
+			session.Save(r, w)
+
+			// redirect user to secretpage
+
+			tmpl := template.Must(template.ParseFiles("static/Templates/secretPage.html"))
+			tmpl.Execute(w, nil)
+			return
+
+		} else if Match == false {
+			// flash error message
+			fmt.Println("Invalid Password")
+		}
+	}else {
 		// flash error message
-		fmt.Println("Invalid Login")
+		fmt.Println("Invalid Username")
 	}
 
 
@@ -99,6 +138,21 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	session, _ := store.Get(r, "cookie-name")
 
+	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec("USE demon")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	data := RegisterDetails{
 		Email: r.FormValue("email"),
 		Username: r.FormValue("UserName"),
@@ -106,50 +160,73 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		ConfPass: r.FormValue("pass2"),
 	}
 
+
+	var (
+		UN string
+		PW string
+		EM string
+
+	)
+
+
 	_ = data
 
 	fmt.Println(data)
 
-	// HashPass, _ := HashPassword(data.Password)
-	// // check password matches or build front end to handle that.
-	// Match := CheckPasswordHash(data.ConfPass, HashPass)
 
+	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, data.Username)
 
-	Userstatus := true
-	/*
-		I will need to change the authentication to account for existing usernames or emails
-		for now it never fails to register someone.
+	defer userCheck.Close()
 
-	*/
-
-
-
-	if Userstatus == true {
-		// both passwords they input match 
-
-		session.Values["authenticated"] = true
-		session.Values["User"] = data.Username
-		session.Save(r, w)
-
-		// redirects user to secret page when they register
-		tmpl := template.Must(template.ParseFiles("static/Templates/secretPage.html"))
-		tmpl.Execute(w, nil)
-		return
-
-	} else if Userstatus == false {
-		// printing to terminal not webpage
-		fmt.Println("Passwords did not match")
+	for userCheck.Next() {
+		err := userCheck.Scan(&UN, &PW)
+		if err != nil {
+			log.Fatal(err)
+		}
 
 	}
 
 
 
+	// if username or email dose NOT exist in database
+	// Hash the password 
 
 
-	// Insert New user into DataBase 
+	// cant use the if statment because it auths user and sends to secret page
 
 
+	if UN == ""{
+		if EM == "" {
+			Hpass, _ := HashPassword(data.Password)
 
+			result, err := db.Exec(`INSERT INTO users (username, password, email, created_at) VALUES (?, ?, ?, ?)`, data.Username, Hpass, data.Email, time.Now())
+			if err != nil {
+				log.Fatal(err)
+			}
+			id, err := result.LastInsertId()
+			fmt.Println(id)
+
+
+			session.Values["authenticated"] = true
+			session.Values["User"] = data.Username
+			session.Save(r, w)
+
+			tmpl := template.Must(template.ParseFiles("static/Templates/secretPage.html"))
+			tmpl.Execute(w, nil)
+			return
+
+
+		}else if EM != "" {
+			// flash email is not available
+			fmt.Println("Email in already in use")
+
+		}
+	}else if UN != "" {
+		// flash username  is not available
+		fmt.Println("Username is not available")
+
+
+	}
 
 	tmpl.Execute(w, struct{ Success bool }{true})
 
@@ -186,7 +263,7 @@ func secretPage(w http.ResponseWriter, r *http.Request) {
 
 func ToolsPage(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("static/templates/tools.html"))
-	session, _ := store.Get(r, "cookie-name")
+	// session, _ := store.Get(r, "cookie-name")
 
 
 
@@ -194,8 +271,6 @@ func ToolsPage(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, nil)
 
 }
-
-
 
 
 
