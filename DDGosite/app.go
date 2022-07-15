@@ -110,9 +110,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(data)
 
-	HashPass, _ := HashPassword(data.Password)
-	// check password matches or build front end to handle that.
-	Match := CheckPasswordHash(data.ConfPass, HashPass)
+	// HashPass, _ := HashPassword(data.Password)
+	// // check password matches or build front end to handle that.
+	// Match := CheckPasswordHash(data.ConfPass, HashPass)
 
 
 	Userstatus := true
@@ -184,6 +184,15 @@ func secretPage(w http.ResponseWriter, r *http.Request) {
 }
 
 
+func ToolsPage(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("static/templates/tools.html"))
+
+
+	tmpl.Execute(w, nil)
+
+}
+
+
 
 
 
@@ -193,8 +202,11 @@ func main() {
 
 	http.HandleFunc("/login", loginPage)
 	http.HandleFunc("/register", Register)
-	http.HandleFunc("/secretPage", secretPage)
+
 	http.HandleFunc("/logout", logout)
+	http.HandleFunc("/secretPage", secretPage)
+	http.HandleFunc("/ToolsPage", secretPage)
+
 
 	log.Print("Listening....")
 

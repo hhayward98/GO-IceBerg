@@ -44,12 +44,7 @@ h1{
 	
 	
 }
-h2{
-	padding: 20px 20px;
-	font-family: 'Baloo Bhai', cursive;
-	font-size: 35px;
 
-}
 h3{
 	padding: 10px 10px;
 }
@@ -121,19 +116,6 @@ section{
 	background-size: cover;
 }
 
-.mainO {
-	color: gold;
-	font-family: 'Arbutus', cursive;
-	font-size: 40px;
-	
-}
-.mainP {
-	color: gold;
-	font-family: 'Arbutus', cursive;
-	font-size: 40px;
-	padding-left: 70px;
-}
-
 
 
 .colpic{
@@ -186,4 +168,20 @@ section{
 	padding-top: 200px
 
 
+}
+
+.Top {
+	padding-top: 200px;
+}
+
+.Top h2 {
+	color: red;
+	padding-top: 50px;
+
+}
+
+.Top p {
+	color: red;
+	padding-top: 20px;
+	padding-left: 50px;
 }
