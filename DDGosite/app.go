@@ -272,6 +272,12 @@ func ToolsPage(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func DAOPage(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("static/templates/DemonDAO.html"))
+
+	tmpl.Execute(w, nil)
+}
+
 
 
 func main() {
@@ -284,7 +290,7 @@ func main() {
 	http.HandleFunc("/logout", logout)
 	http.HandleFunc("/secretPage", secretPage)
 	http.HandleFunc("/ToolsPage", ToolsPage)
-
+	http.HandleFunc("/DemonDAO", DAOPage)
 
 	log.Print("Listening....")
 
