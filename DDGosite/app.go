@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"fmt"
+	"strings"
 	"html/template"
 	"net/http"
 	"time"
@@ -35,6 +36,29 @@ type RegisterDetails struct {
 	ConfPass string
 }
 
+func QueryHandler(query string) {
+	// testing for bugs
+	res1 := strings.Contains(query, "=")
+    res2 := strings.Contains(query, "-")
+    res3 := strings.Contains(query, ";")
+    res4 := strings.Contains(query, ":")
+    res5 := strings.Contains(query, "'")
+
+    if res1 == true{
+    	return false
+    }else if res2 == true{
+    	return false
+    }else if res3 == true{
+    	return false
+    }else if res4 == true{
+    	return false
+    } else if res5 == true{
+    	return false
+    }else {
+    	return true
+    }
+
+}
 
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 32)
@@ -81,6 +105,21 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 	_ = data
 
 	fmt.Println(data)
+
+	// need to test for bugs
+
+	strcheck := QueryHandler(data.Username)
+
+	if strcheck == false{
+		fmt.Println("string Contains illegal characters")
+
+		//inform user that those chars are illegal
+
+		tmpl.Execute(w, nil)
+
+	}
+
+	// Cleanput := strings.Replace(data.Username)
 
 
 	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, data.Username)
@@ -129,6 +168,7 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Invalid Username")
 	}
 
+	// tmpl.Execute(w, nil)
 
 	tmpl.Execute(w, struct{ Success bool }{true})
 }
@@ -192,8 +232,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	// Hash the password 
 
 
-	// cant use the if statment because it auths user and sends to secret page
-
+	// if statment auths user to grant access to secret page for that session
+	// must clean userinput before query
+	// this is done to prevent SQL-injections
 
 	if UN == ""{
 		if EM == "" {
@@ -278,6 +319,11 @@ func DAOPage(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, nil)
 }
 
+func Projects(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("static/templates/Projects.html"))
+
+	tmpl.Execute(w, nil)
+}
 
 
 func main() {
@@ -291,6 +337,7 @@ func main() {
 	http.HandleFunc("/secretPage", secretPage)
 	http.HandleFunc("/ToolsPage", ToolsPage)
 	http.HandleFunc("/DemonDAO", DAOPage)
+	http.HandleFunc("/Projects", Projects)
 
 	log.Print("Listening....")
 
