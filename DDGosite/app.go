@@ -17,12 +17,10 @@ import (
 )
 
 var (
-
 	key = []byte("923ef6d931b1d39b9db72a224567f080f3360c493ac72295378fcb43e8cda6c2")
 	store = sessions.NewCookieStore(key)
 	// user = nil
 	// store = sessions.NewCookieStore(user)
-
 )
 
 type LoginRequest struct {
@@ -36,6 +34,11 @@ type RegisterDetails struct {
 	Username string
 	Password string
 	ConfPass string
+}
+
+func Sessid() string {
+	// create a unique string of bytes to be used for identifying sessions
+	//pass the func when registering new users or when users login
 }
 
 func QueryHandler(query string) bool{
@@ -138,7 +141,6 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 		//inform user that those chars are illegal
 
 		tmpl.Execute(w, struct{ Success bool }{true})
-
 	}
 
 	// Cleanput := strings.Replace(data.Username)
@@ -193,7 +195,7 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 		tmpl.Execute(w, struct{ Success bool }{true})
 	}
 
-	tmpl.Execute(w, struct{ Success bool }{false})
+	// tmpl.Execute(w, struct{ Success bool }{false})
 
 }
 
@@ -343,7 +345,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Username is empty")
 	}
 	
-	tmpl.Execute(w, struct{ Success bool }{false})
+	// tmpl.Execute(w, struct{ Success bool }{false})
 
 }
 
@@ -362,7 +364,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 func secretPage(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("static/templates/secretPgae.html"))
 	session, _ := store.Get(r, "cookie-name")
-
+	session.Get()
 
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 		http.Error(w, "Forbidden", http.StatusForbidden)

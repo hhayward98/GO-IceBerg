@@ -154,8 +154,10 @@ section{
 
 .LoginForm {
 	align-content: center;
-
 	padding-top: 200px;
+}
+.LoginForm p {
+	color: red;
 }
 
 .RegisterForm {

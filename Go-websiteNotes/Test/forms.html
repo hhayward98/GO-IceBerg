@@ -1,12 +1,24 @@
 {{if .Success}}
-	<h1>Thanks for loging in </h1>
+	<div class = "LoginForm">
+		<h1>Login</h1>
+		<p>There was an Error!! Check your username and password. Make sure the form is not empty and remember the use of "= - ; : ' " is prohibited!!</p>
+		<form method="POST">
+			<label>Username</label><br />
+			<input type="username" name="UserName"><br />
+			<label>Password</label><br />
+			<input type="password" name="PassWord"><br />
+			<input type="submit">
+		</form>
+	</div>
 {{else}}
-	<h1>Login</h1>
-	<form method="POST">
-		<label>Username:</label><br />
-		<input type="username" name="Username"><br />
-		<label>Password:</label><br />
-		<input type="password" name="Password"><br />
-		<input type="submit">
-	</form>
+	<div class = "LoginForm">
+		<h1>Login</h1>
+		<form method="POST">
+			<label>Username</label><br />
+			<input type="username" name="UserName"><br />
+			<label>Password</label><br />
+			<input type="password" name="PassWord"><br />
+			<input type="submit">
+		</form>
+	</div>
 {{end}}
