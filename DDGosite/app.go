@@ -23,6 +23,34 @@ var (
 	// store = sessions.NewCookieStore(user)
 )
 
+var store2 = sessions.NewCookieStore(
+	[]byte("new-Auth-key"),
+	[]byte("new-encryption-key"),
+	[]byte("old-auth-key"),
+	[]byte("old-encryption-key"),
+)
+
+type SeshManager struct {
+	cookieName	string 
+	lock	sync.Mutex
+	provider	Provider
+	maxlifetime int64
+}
+
+type Session interface {
+	Set(key, value interface{}) error //set session value
+	Get(key interface{}) interface{} //get session value
+	Delete(key interface{}) error // delete session value
+	SessionID() string	
+}
+
+type Provider interface {
+	SessionInit(sid string) (Session, error)
+	SessionRead(sid string) (Session, error)
+	SessionDestroy(sid string) error
+	sessionGC(maxLifeTime int64)
+}
+
 type LoginRequest struct {
 	Username string
 	Password string
@@ -36,9 +64,17 @@ type RegisterDetails struct {
 	ConfPass string
 }
 
-func Sessid() string {
-	// create a unique string of bytes to be used for identifying sessions
-	//pass the func when registering new users or when users login
+// func Sessid() string {
+// 	// create a unique string of bytes to be used for identifying sessions
+// 	//pass the func when registering new users or when users login
+// }
+
+func NewManager(Name, cookieName string, maxlifetime int64) (*SeshManager, error) {
+	provider, ok := provides[Name]
+	if !ok {
+		return nil, fmt.Errorf("session: unkown name %q ", Name)
+	}
+	return &SeshManager{provider: provider, cookieName: cookieName, maxlifetime: maxlifetime}, nil
 }
 
 func QueryHandler(query string) bool{
@@ -87,6 +123,32 @@ func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
+
+
+//session manager
+
+func (manager *SeshManager) SessionStart(w http.ResponseWriter, r *http.Request) (session Session) {
+	manager.lock.Lock()
+	defer manager.lock.Unlock()
+	cookie, err := r.Cookie(manager.cookieName)
+	if err != nil || cookie.Value == "" {
+		sid := manager.sessionId()
+		session, _ = manager.provider.SessionInit(sid)
+		cookie := http.Cookie{Name: manager.cookieName, Value: url.QueryEscape(sid), Path: "/", HttpOnly: true, MaxAge: int(manager.maxlifetime)}
+		http.SetCookie(w, &cookie)
+	} else {
+		sid, _ := url.QueryUnescape(cookie.Value)
+		session, _ = manager.provider.SessionRead(sid)
+	}
+	return
+}
+
+
+
+
+
+
+
 
 func loginPage(w http.ResponseWriter, r *http.Request) {
 
@@ -186,11 +248,13 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 
 		} else if Match == false {
 			// flash error message
+			session.AddFlash("Invalid Password")
 			fmt.Println("Invalid Password")
 			tmpl.Execute(w, struct{ Success bool }{true})
 		}
 	}else {
 		// flash error message
+		session.AddFlash("Invalid Username")
 		fmt.Println("Invalid Username")
 		tmpl.Execute(w, struct{ Success bool }{true})
 	}
@@ -313,34 +377,40 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 						}else if EM != "" {
 							// flash email is not available
-							tmpl.Execute(w, struct{ Success bool }{true})
+							session.AddFlash("Email is not available")
+							tmpl.Execute(w, nil)
 							fmt.Println("Email in already in use")
 
 						}
 					}else if UN != "" {
 						// flash username  is not available
-						tmpl.Execute(w, struct{ Success bool }{true})
+						session.AddFlash("Username is not available")
+						tmpl.Execute(w, nil)
 						fmt.Println("Username is not available")
 					}
 
 				}else if data.Email == ""{
 					// flash email is empty
+					session.AddFlash("Email can not be empty")
 					tmpl.Execute(w, struct{ Success bool }{false})
 					fmt.Println("Username is not available")
 				}
 			}else{
 				//flash password is not the same
+				session.AddFlash("password is not the same")
 				tmpl.Execute(w, struct{ Success bool }{false})
 				fmt.Println("Passwords are not the same")
 			}
 
 		}else if data.Password == "" {
 			// flash password is empty
+			session.AddFlash("password can not be empty")
 			tmpl.Execute(w, struct{ Success bool }{false})
 			fmt.Println("Password is empty")
 		}
 	}else if data.Username == "" {
 		// flasj Username is empty
+		session.AddFlash("Username can not be empty")
 		tmpl.Execute(w, struct{ Success bool }{false})
 		fmt.Println("Username is empty")
 	}
@@ -364,11 +434,15 @@ func logout(w http.ResponseWriter, r *http.Request) {
 func secretPage(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("static/templates/secretPgae.html"))
 	session, _ := store.Get(r, "cookie-name")
-	session.Get()
+	// session.Get()
 
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
+	}
+
+	if session.Values["authenticated"] == true {
+		fmt.Println(session.Values["user"])
 	}
 
 
@@ -379,10 +453,13 @@ func secretPage(w http.ResponseWriter, r *http.Request) {
 
 
 func ToolsPage(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
 	tmpl := template.Must(template.ParseFiles("static/templates/tools.html"))
 	// session, _ := store.Get(r, "cookie-name")
 
-
+	if session.Values["authenticated"] == true {
+		fmt.Println(session.Values["user"])
+	}
 
 
 	tmpl.Execute(w, nil)
@@ -390,13 +467,27 @@ func ToolsPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func DAOPage(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
 	tmpl := template.Must(template.ParseFiles("static/templates/DemonDAO.html"))
 
+
+	if session.Values["authenticated"] == true {
+		fmt.Println(session.Values["user"])
+	}
+
+	
 	tmpl.Execute(w, nil)
 }
 
 func Projects(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
 	tmpl := template.Must(template.ParseFiles("static/templates/Projects.html"))
+
+	
+	if session.Values["authenticated"] == true {
+		fmt.Println(session.Values["user"])
+	}
+
 
 	tmpl.Execute(w, nil)
 }
@@ -416,6 +507,12 @@ func main() {
 	http.HandleFunc("/Projects", Projects)
 
 	log.Print("Listening....")
+
+	var globalSessions*session.SeshManager
+
+	func init() {
+		globalSessions = NewManager("memory", "gosessionid", 3600)
+	}
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
