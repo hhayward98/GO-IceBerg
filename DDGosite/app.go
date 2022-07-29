@@ -5,7 +5,8 @@ import (
 	"log"
 	"fmt"
 	"strings"
-
+	// "crypto/sha256"
+	// "sync"
 	// "container/list"
 	"html/template"
 	"net/http"
@@ -15,6 +16,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 )
+
+var tpl *template.Template 
 
 var (
 	key = []byte("923ef6d931b1d39b9db72a224567f080f3360c493ac72295378fcb43e8cda6c2")
@@ -30,26 +33,7 @@ var store2 = sessions.NewCookieStore(
 	[]byte("old-encryption-key"),
 )
 
-type SeshManager struct {
-	cookieName	string 
-	lock	sync.Mutex
-	provider	Provider
-	maxlifetime int64
-}
 
-type Session interface {
-	Set(key, value interface{}) error //set session value
-	Get(key interface{}) interface{} //get session value
-	Delete(key interface{}) error // delete session value
-	SessionID() string	
-}
-
-type Provider interface {
-	SessionInit(sid string) (Session, error)
-	SessionRead(sid string) (Session, error)
-	SessionDestroy(sid string) error
-	sessionGC(maxLifeTime int64)
-}
 
 type LoginRequest struct {
 	Username string
@@ -64,18 +48,6 @@ type RegisterDetails struct {
 	ConfPass string
 }
 
-// func Sessid() string {
-// 	// create a unique string of bytes to be used for identifying sessions
-// 	//pass the func when registering new users or when users login
-// }
-
-func NewManager(Name, cookieName string, maxlifetime int64) (*SeshManager, error) {
-	provider, ok := provides[Name]
-	if !ok {
-		return nil, fmt.Errorf("session: unkown name %q ", Name)
-	}
-	return &SeshManager{provider: provider, cookieName: cookieName, maxlifetime: maxlifetime}, nil
-}
 
 func QueryHandler(query string) bool{
 	// testing for bugs
@@ -125,28 +97,6 @@ func CheckPasswordHash(password, hash string) bool {
 }
 
 
-//session manager
-
-func (manager *SeshManager) SessionStart(w http.ResponseWriter, r *http.Request) (session Session) {
-	manager.lock.Lock()
-	defer manager.lock.Unlock()
-	cookie, err := r.Cookie(manager.cookieName)
-	if err != nil || cookie.Value == "" {
-		sid := manager.sessionId()
-		session, _ = manager.provider.SessionInit(sid)
-		cookie := http.Cookie{Name: manager.cookieName, Value: url.QueryEscape(sid), Path: "/", HttpOnly: true, MaxAge: int(manager.maxlifetime)}
-		http.SetCookie(w, &cookie)
-	} else {
-		sid, _ := url.QueryUnescape(cookie.Value)
-		session, _ = manager.provider.SessionRead(sid)
-	}
-	return
-}
-
-
-
-
-
 
 
 
@@ -154,7 +104,12 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 
 	tmpl := template.Must(template.ParseFiles("static/Templates/Login.html"))
 
-	session, _ := store.Get(r, "cookie-name")
+	// session, _ := r.Cookie("cookie-name")
+
+	//add err
+
+	// sessionToken := "generate UI for sessions"
+
 
 
 	// connect to Database
@@ -236,25 +191,30 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 
 		// auths the session and routs user to secret page
 		if Match == true {
+
+			session, _ := store.Get(r, "cookie-name")
+
+			// redirect user to secretpage
 			session.Values["authenticated"] = true
 			session.Values["User"] = data.Username
 			session.Save(r, w)
 
-			// redirect user to secretpage
+			tpl.ExecuteTemplate(w, "secretPage.html", "auth")
 
-			tmpl := template.Must(template.ParseFiles("static/Templates/secretPage.html"))
-			tmpl.Execute(w, nil)
+
+			// http.Redirect(w, r, "/secretPage", http.StatusFound)
+
 			return
 
 		} else if Match == false {
 			// flash error message
-			session.AddFlash("Invalid Password")
+			// session.AddFlash("Invalid Password")
 			fmt.Println("Invalid Password")
 			tmpl.Execute(w, struct{ Success bool }{true})
 		}
 	}else {
 		// flash error message
-		session.AddFlash("Invalid Username")
+		// session.AddFlash("Invalid Username")
 		fmt.Println("Invalid Username")
 		tmpl.Execute(w, struct{ Success bool }{true})
 	}
@@ -369,8 +329,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 							session.Values["User"] = data.Username
 							session.Save(r, w)
 
-							tmpl := template.Must(template.ParseFiles("static/Templates/secretPage.html"))
-							tmpl.Execute(w, nil)
+							http.Redirect(w, r, "static/Templates/secretPage.html", http.StatusFound)
+							// tmpl := template.Must(template.ParseFiles("static/Templates/secretPage.html"))
+							// tmpl.Execute(w, session)
 
 							return
 
@@ -428,26 +389,26 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	session.Values["User"] = nil
 	session.Save(r, w)
 
+	http.Redirect(w, r, "/", http.StatusFound)
+
 }
 
 
 func secretPage(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("static/templates/secretPgae.html"))
 	session, _ := store.Get(r, "cookie-name")
-	// session.Get()
+	fmt.Println(session)
 
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
 
-	if session.Values["authenticated"] == true {
-		fmt.Println(session.Values["user"])
-	}
 
+	test := session.Values["user"]
+	if test == nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	} 
+	// else if test is a registered user then 
+
+	tmpl := template.Must(template.ParseFiles("static/templates/tools.html"))
 
 	tmpl.Execute(w, nil)
-
 
 }
 
@@ -494,6 +455,9 @@ func Projects(w http.ResponseWriter, r *http.Request) {
 
 
 func main() {
+
+	tpl, _ = template.ParseGlob("./static/Templates/*html")
+
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 
@@ -501,18 +465,14 @@ func main() {
 	http.HandleFunc("/register", Register)
 
 	http.HandleFunc("/logout", logout)
-	http.HandleFunc("/secretPage", secretPage)
+	http.HandleFunc("/SecretPage", secretPage)
 	http.HandleFunc("/ToolsPage", ToolsPage)
 	http.HandleFunc("/DemonDAO", DAOPage)
 	http.HandleFunc("/Projects", Projects)
 
 	log.Print("Listening....")
 
-	var globalSessions*session.SeshManager
 
-	func init() {
-		globalSessions = NewManager("memory", "gosessionid", 3600)
-	}
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {

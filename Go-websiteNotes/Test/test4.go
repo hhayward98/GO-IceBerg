@@ -3,6 +3,10 @@ package main
 import (
 	"net/http"
 	"github.com/gorilla/sessions"
+	"fmt"
+	"sync"
+	"html/template"
+
 )
 
 
@@ -10,16 +14,21 @@ var store = sessions.NewCookieStore(
 	[]byte("new-Auth-key"),
 	[]byte("new-encryption-key"),
 	[]byte("old-auth-key"),
-	[]byte("old-encryption-key")
+	[]byte("old-encryption-key"),
 )
 
 
 // Session manager
 
+type LoginRequest struct {
+	Username string
+	Password string
+
+}
 
 type SManager struct {
 	cookieName	string // private 
-	lcok		sync.Mutex // protects session
+	lock		sync.Mutex // protects session
 	provider	Provider
 	maxlifetime int64
 }
@@ -35,33 +44,23 @@ type Session interface {
 	Set(key, value interface{}) error //set session value
 	Get(key interface{}) interface{} //get session value
 	Delete(key interface{}) error // delete session value
-	SessionID() string	
+	sessionId() string	
 }
 
-func login(w http.ResponseWriter, r *http.Request) {
-	sesh := globalSessions.SessionStart(w, r)
-	
-
-	r.ParseForm()
-	if r.Method == "GET"{
-		tmpl, _ :=template.ParseFiles("login.gtpl")
-		tmpl.Execute(w, sesh.Get("username"))
-	}
-
-}
-
-func NewManager(givename, cookieName string, maxlifetime int64) (*SManager, error) {
-	provider, ok := provides[provideName]
+func NewManager(Name, cookieName string, maxlifetime int64) (*SManager, error) {
+	provider, ok := provides[Name]
 	if !ok {
-		return nil, fmt.Errorf("Session: unkown provide %q (forgotten import?)", givename)
+		return nil, fmt.Errorf("Session: unkown provide %q (forgotten import?)", Name)
 	}
-	return &Manager{provider: provider, cookieName: cookieName, maxlifetime: maxlifetime}, nil
+	return &SManager{provider: provider, cookieName: cookieName, maxlifetime: maxlifetime}, nil
 }
 
 func init() {
+
 	globalSessions = NewManager("memory", "gosessionid", 3600)
 }
 
+var provides = make(map[string]Provider)
 
 func (manager *SManager) SessionStart(w http.ResponseWriter, r *http.Request) (session Session) {
 	manager.lock.Lock()
@@ -75,15 +74,64 @@ func (manager *SManager) SessionStart(w http.ResponseWriter, r *http.Request) (s
 		http.SetCookie(w, &cookie)
 	}else {
 		sid, _ := url.QueryUnescape(cookie.Value)
-		session, _ = manaer.provider.SessionRead(sid)
+		session, _ = manager.provider.SessionRead(sid)
 	}
 	return
 }
 
-func main() {
+
+func secretPage(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("static/templates/secretPgae.html"))
+
+	fmt.Println(Session.sessionId())
 
 
-	// create global session manager 
-	var globalSessions *session.Manager
+
+	tmpl.Execute(w, nil)
+
 
 }
+
+func login(w http.ResponseWriter, r *http.Request) {
+
+	tmpl := template.Must(template.ParseFiles("forms.html"))
+
+	sesh := globalSessions.SessionStart(w,r)
+
+	data := LoginRequest{
+		Username: r.FormValue("Username"),
+		Password: r.FormValue("Password"),
+	}
+
+	_ = data
+
+	if data.Username != "" {
+		if data.Password != ""{
+			sesh.Set("authenticated", true)
+			sesh.Set("user", data.Username)
+
+			tmpl.Execute(w, sesh)
+			fmt.Println(data.Username)
+			fmt.Println(data.Password)
+		}else {
+			fmt.Println("Password cant be null")
+			tmpl.Execute(w, struct{ Success bool }{false})
+		}
+	}else {
+		fmt.Println("Username cant be null")
+		tmpl.Execute(w, struct{ Success bool }{false})
+	}
+
+}
+
+func main() {
+	var globalSessions *session.SManager
+
+
+
+	http.HandleFunc("/", login)
+	http.HandleFunc("/secretPage", secretPage)
+	http.ListenAndServe(":8080", nil)
+	// navigate to http://localhost:8080/
+}
+

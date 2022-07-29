@@ -14,7 +14,10 @@ type LoginRequest struct {
 
 }
 
+
 func main() {
+
+	var globalSessions *session.Manager
 	tmpl := template.Must(template.ParseFiles("forms.html"))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

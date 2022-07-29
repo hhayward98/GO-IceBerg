@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gotilla/sessions"
+	"github.com/gorilla/sessions"
 
 )
 
@@ -17,7 +17,9 @@ var (
 )
 
 func secret(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
+	session, _ := store.Get("cookie-name")
+	c, _ := r.Cookie("cookie-name")
+	fmt.Println(c)
 
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
@@ -32,6 +34,7 @@ func secret(w http.ResponseWriter, r *http.Request) {
 func login(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
+	fmt.Println(session)
 	// Authenticate user here 
 
 	// set user as Authenticated
@@ -40,7 +43,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
-	session, _ :=store.get(r, "cookie-name")
+	session, _ :=store.Get(r, "cookie-name")
 
 	// revoke user Aithentication from session
 	session.Values["authenticated"] = false
