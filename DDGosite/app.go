@@ -9,6 +9,7 @@ import (
 	// "sync"
 	// "container/list"
 	"html/template"
+	"net/mail"
 	"net/http"
 	"time"
 	"golang.org/x/crypto/bcrypt"
@@ -46,6 +47,15 @@ type RegisterDetails struct {
 	Username string
 	Password string
 	ConfPass string
+}
+
+func validateEmail(addy string) (strin, bool) {
+	addr, err := mail.ParseAddress(addy)
+	if err != nil {
+		return "", false
+
+	}
+	return addr.Address, true
 }
 
 
@@ -289,6 +299,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	// could probally join query
 
 	EmailCheck, _ := db.Query(`SELECT email FROM users WHERE email = ?`, data.Email)
+	
+	// Vmail := validateEmail(EmailCheck).(bool)
+	// if Vmail 
 
 	defer EmailCheck.Close()
 
