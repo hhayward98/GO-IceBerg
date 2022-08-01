@@ -170,11 +170,13 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 		tmpl.Execute(w, struct{ Success bool }{true})
 	}
 
+
+	UNlower := strings.ToLower(data.Username)
 	// Cleanput := strings.Replace(data.Username)
 
 
 	// Query user from Database
-	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, data.Username)
+	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
 
 	defer userCheck.Close()
 
@@ -193,7 +195,7 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 
 
 	// if UN was in database this statment would pass
-	if UN == data.Username {
+	if UN == UNlower {
 	
 		// checks if user input the password correctly
 		Match := CheckPasswordHash(data.Password, PW)
@@ -206,7 +208,7 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 
 			// redirect user to secretpage
 			session.Values["authenticated"] = true
-			session.Values["User"] = data.Username
+			session.Values["User"] = UNlower
 			session.Save(r, w)
 
 			tpl.ExecuteTemplate(w, "secretPage.html", "auth")
@@ -281,9 +283,23 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(data)
 
 
+	strcheck := QueryHandler(data.Username)
+
+	if strcheck == false{
+		// flash invalid use of chars "=-;:'"
+		fmt.Println("string Contains illegal characters")
+
+		//inform user that those chars are illegal
+
+		tmpl.Execute(w, struct{ Success bool }{true})
+	}
+
+
+	UNlower := strings.ToLower(data.Username)
+
 	// Query database to see if username exist
 
-	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, data.Username)
+	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
 
 	defer userCheck.Close()
 
@@ -330,7 +346,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 							Hpass, _ := HashPassword(data.Password)
 
-							result, err := db.Exec(`INSERT INTO users (username, password, email, created_at) VALUES (?, ?, ?, ?)`, data.Username, Hpass, data.Email, time.Now())
+							result, err := db.Exec(`INSERT INTO users (username, password, email, created_at) VALUES (?, ?, ?, ?)`, UNlower, Hpass, data.Email, time.Now())
 							if err != nil {
 								log.Fatal(err)
 							}
@@ -339,7 +355,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 
 							session.Values["authenticated"] = true
-							session.Values["User"] = data.Username
+							session.Values["User"] = UNlower
 							session.Save(r, w)
 
 							http.Redirect(w, r, "static/Templates/secretPage.html", http.StatusFound)
