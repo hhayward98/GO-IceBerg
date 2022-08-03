@@ -11,7 +11,7 @@ var tpl *template.Template
 
 func Method1(w http.ResponseWriter, r *http.Request) {
 
-	tmpl := template.Must(template.ParseFiles("static/Templates/Method1.html"))
+	tmpl := template.Must(template.ParseFiles("static/templates/Method1.html"))
 
 	tmpl.Execute(w, nil)
 }
@@ -23,7 +23,8 @@ func Method2(w http.ResponseWriter, r *http.Request) {
 
 func Method3(w http.ResponseWriter, r *http.Request) {
 
-	http.Redirect(w, r, "static/templates/Method3", http.StatusFound)
+	http.Redirect(w, r, "static/templates/Method3.html", 201)
+	return
 }
 
 func main() {

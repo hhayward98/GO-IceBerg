@@ -1,11 +1,18 @@
 package main 
 
 import (
+	"database/sql"
 	"fmt"
+	"strings"
 	"net/http"
+	"html/template"
 	"log"
+	"time"
 	"reflect"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var tpl *template.Template
@@ -24,7 +31,7 @@ type RegisterDetails struct {
 
 
 // use cach/database
-var sessions = map[string]session{}
+var sessions = map[string]Session{}
 
 
 // session Values
@@ -51,6 +58,8 @@ func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
+
+
 
 func login(w http.ResponseWriter, r *http.Request) {
 
@@ -98,9 +107,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	if UN == UNlower {
 
-		if Match := CheckPasswordHash(data.Password, PW); == true{
+		if Match := CheckPasswordHash(data.Password, PW); Match == true{
 
-			seshToken := uuid.New()
+			seshToken := uuid.NewString()
 			expiresAt := time.Now().Add(120 * time.Second)
 
 
@@ -116,7 +125,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 			//set cookie
 			http.SetCookie(w, &http.Cookie{
-				Name: "Session_token"
+				Name: "Session_token",
 				Value: seshToken,
 				Expires: expiresAt,
 			})
@@ -136,8 +145,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "static/templates/login.html", http.StatusFound)
-	return
+	tpl.ExecuteTemplate(w, "login.html", "null")
 
 }
 
@@ -252,7 +260,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(id)
 
 
-			seshToken := uuid.New()
+			seshToken := uuid.NewString()
 			expiresAt := time.Now().Add(120 * time.Second)
 
 
@@ -265,7 +273,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 			//set cookie
 			http.SetCookie(w, &http.Cookie{
-				Name: "Session_token"
+				Name: "Session_token",
 				Value: seshToken,
 				Expires: expiresAt,
 			})
@@ -306,7 +314,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	seshToken := cook.Value
 
-	Usesh, exists := Session[seshToken]
+	Usesh, exists := sessions[seshToken]
 	if !exists {
 
 		http.Redirect(w, r, "static/templates/login.html", http.StatusFound)
