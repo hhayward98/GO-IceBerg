@@ -21,6 +21,11 @@ func Method2(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "Method2.html", "auth")
 }
 
+func Method3(w http.ResponseWriter, r *http.Request) {
+
+	http.Redirect(w, r, "static/templates/Method3", http.StatusFound)
+}
+
 func main() {
 
 	tpl, _ = template.ParseGlob("./static/Templates/*html")
