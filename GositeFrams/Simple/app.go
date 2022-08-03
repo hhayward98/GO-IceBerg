@@ -32,6 +32,7 @@ func main() {
 
 	http.HandleFunc("/Method1", Method1)
 	http.HandleFunc("/Method2", Method2)
+	http.HandleFunc("/Method3", Method3)
 
 	log.Print("Listening....")
 	log.Fatal(http.ListenAndServe(":8080", nil))
