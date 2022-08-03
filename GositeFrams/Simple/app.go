@@ -1,11 +1,11 @@
 package main 
 
-import {
-	"fmt"
+import (
+
 	"net/http"
 	"log"
 	"html/template"
-}
+)
 
 var tpl *template.Template
 
@@ -16,7 +16,7 @@ func Method1(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, nil)
 }
 
-func Method2(w http.ResponseWriter, *http.Request) {
+func Method2(w http.ResponseWriter, r *http.Request) {
 
 	tpl.ExecuteTemplate(w, "Method2.html", "auth")
 }
