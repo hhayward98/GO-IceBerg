@@ -2,13 +2,13 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	// "fmt"
 	"strings"
 	"net/http"
 	"html/template"
 	"log"
 	"time"
-	"reflect"
+	// "reflect"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
@@ -82,83 +82,116 @@ func login(w http.ResponseWriter, r *http.Request) {
 		Password: r.FormValue("PassWord"),
 
 	}
-
-	var (
-		
-		UN string
-		PW string
-		
-	)
 	_ = data
 
 	UNlower := strings.ToLower(data.Username)
 
-	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
+	// var (
+		
+	// 	UN string
+	// 	PW string
+		
+	// )
 
-	defer userCheck.Close()
+	// userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
 
-	for userCheck.Next() {
-		err := userCheck.Scan(&UN, &PW)
-		if err != nil {
-			log.Fatal(err)
+	// defer userCheck.Close()
+
+	// for userCheck.Next() {
+	// 	err := userCheck.Scan(&UN, &PW)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+
+	// }
+
+
+	// if UN == UNlower {
+
+	// 	if Match := CheckPasswordHash(data.Password, PW); Match == true{
+
+	// 		seshToken := uuid.NewString()
+	// 		expiresAt := time.Now().Add(120 * time.Second)
+
+
+	// 		// add seshToken to session cach/database
+	// 		// since im not using cach/database
+	// 		// mapping to sessions map 
+	// 		sessions[seshToken] = Session{
+	// 			Authenticated: true,
+	// 			username: UNlower,
+	// 			expiry: expiresAt,
+	// 		}
+
+
+	// 		//set cookie
+	// 		http.SetCookie(w, &http.Cookie{
+	// 			Name: "Session_token",
+	// 			Value: seshToken,
+	// 			Expires: expiresAt,
+	// 		})
+
+	// 		tpl.ExecuteTemplate(w, "Home.html", "null")
+	// 		return
+
+	// 	}
+
+	// 	fmt.Println("Invalid Password")
+	// 	tpl.ExecuteTemplate(w, "login.html", "null")
+	// 	return
+	// } else if UN != UNlower {
+
+	// 	fmt.Println("Invalid Username")
+	// 	tpl.ExecuteTemplate(w, "login.html", "null")
+	// 	return
+	// }
+
+	// tpl.ExecuteTemplate(w, "login.html", "null")
+
+
+
+	if data.Password == "password"{
+
+
+		seshToken := uuid.NewString()
+		expiresAt := time.Now().Add(120 * time.Second)
+
+
+		// add seshToken to session cach/database
+		// since im not using cach/database
+		// mapping to sessions map 
+		sessions[seshToken] = Session{
+			Authenticated: true,
+			username: UNlower,
+			expiry: expiresAt,
 		}
 
-	}
 
-	if UN == UNlower {
-
-		if Match := CheckPasswordHash(data.Password, PW); Match == true{
-
-			seshToken := uuid.NewString()
-			expiresAt := time.Now().Add(120 * time.Second)
-
-
-			// add seshToken to session cach/database
-			// since im not using cach/database
-			// mapping to sessions map 
-			sessions[seshToken] = Session{
-				Authenticated: true,
-				username: UNlower,
-				expiry: expiresAt,
-			}
-
-
-			//set cookie
-			http.SetCookie(w, &http.Cookie{
-				Name: "Session_token",
-				Value: seshToken,
-				Expires: expiresAt,
-			})
-			http.Redirect(w, r, "static/templates/Home.html", http.StatusFound)
-			
-			return
-
-		}
-		http.Redirect(w, r, "static/templates/login.html", http.StatusUnauthorized)
-		fmt.Println("Invalid Password")
-		// tpl.ExecuteTemplate(w, "login.html", "null")
+		//set cookie
+		http.SetCookie(w, &http.Cookie{
+			Name: "Session_token",
+			Value: seshToken,
+			Expires: expiresAt,
+		})
+		tpl.ExecuteTemplate(w, "Home.html", "null")
 		return
-	} else if UN != UNlower {
-		http.Redirect(w, r, "static/templates/login.html", http.StatusUnauthorized)
-		fmt.Println("Invalid Username")
-		// tpl.ExecuteTemplate(w, "login.html", "null")
-		return
+
 	}
 
 	tpl.ExecuteTemplate(w, "login.html", "null")
-
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
 	cook, err := r.Cookie("Session_token")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			http.Redirect(w, r, "static/templates/login.html", http.StatusFound)
-			// redirect
+
+			tpl.ExecuteTemplate(w, "index.html", "null")
+
 			return
 		}
+
 		w.WriteHeader(http.StatusBadRequest)
-		// redirect
 		return
 	}
 
@@ -172,8 +205,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now(),
 	})
 
-	http.Redirect(w, r, "static/templates/Home.html", http.StatusFound)
-	// tpl.ExecuteTemplate(w, "login.html", "null")
+	tpl.ExecuteTemplate(w, "index.html", "null")
 
 }
 
@@ -201,101 +233,76 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		ConfPass: r.FormValue("pass2"),
 	}
 
-	var (
-		UN string
-		PW string
-		EM string
-	)
 
 	_ = data
 
-	v := reflect.ValueOf(data)
-
-	// checks for empty fields from imput
-	for i := 0; i < v.NumField(); i++ {
-		if v.Field(i).Interface() == ""{
-			// if Field is empty, reload page
-			http.Redirect(w, r, "static/templates/register.html", http.StatusUnauthorized)
-			return
-			// tpl.ExecuteTemplate(w, "register.html", "null") 
-		}
-	}
-
 	UNlower := strings.ToLower(data.Username)
 
-	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
-	defer userCheck.Close()
+	// var (
+	// 	UN string
+	// 	PW string
+	// 	EM string
+	// )
 
-	// scaning values from Database
-	for userCheck.Next() {
-		err := userCheck.Scan(&UN, &PW)
-		if err != nil {
-			log.Fatal(err)
+	// v := reflect.ValueOf(data)
+
+	// checks for empty fields from imput
+	// for i := 0; i < v.NumField(); i++ {
+	// 	if v.Field(i).Interface() == ""{
+	// 		// if Field is empty, reload page
+	// 		tpl.ExecuteTemplate(w, "register.html", "null")
+	// 		return
+	// 	}
+	// }
+
+	// userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
+	// defer userCheck.Close()
+
+	// // scaning values from Database
+	// for userCheck.Next() {
+	// 	err := userCheck.Scan(&UN, &PW)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+
+	// }
+
+	// EmailCheck, _ := db.Query(`SELECT email FROM users WHERE email = ?`, data.Email)
+	// defer EmailCheck.Close()
+
+	// for EmailCheck.Next() {
+	// 	err := EmailCheck.Scan(&EM)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }
+
+
+
+	if data.Password == "password" {
+
+		seshToken := uuid.NewString()
+		expiresAt := time.Now().Add(120 * time.Second)
+
+
+		sessions[seshToken] = Session{
+			Authenticated: true,
+			username: UNlower,
+			expiry: expiresAt,
 		}
 
-	}
 
-	EmailCheck, _ := db.Query(`SELECT email FROM users WHERE email = ?`, data.Email)
-	defer EmailCheck.Close()
+		//set cookie
+		http.SetCookie(w, &http.Cookie{
+			Name: "Session_token",
+			Value: seshToken,
+			Expires: expiresAt,
+		})
 
-	for EmailCheck.Next() {
-		err := EmailCheck.Scan(&EM)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	if UN == "" {
-
-		if EM == "" {
-
-
-			Hpass, _ := HashPassword(data.Password)
-
-			result, err := db.Exec(`INSERT INTO users (username, password, email, created_at) VALUES (?, ?, ?, ?)`, UNlower, Hpass, data.Email, time.Now())
-			if err != nil {
-				log.Fatal(err)
-			}
-			id, err := result.LastInsertId()
-			fmt.Println(id)
-
-
-			seshToken := uuid.NewString()
-			expiresAt := time.Now().Add(120 * time.Second)
-
-
-			sessions[seshToken] = Session{
-				Authenticated: true,
-				username: UNlower,
-				expiry: expiresAt,
-			}
-
-
-			//set cookie
-			http.SetCookie(w, &http.Cookie{
-				Name: "Session_token",
-				Value: seshToken,
-				Expires: expiresAt,
-			})
-
-			http.Redirect(w, r, "static/templates/Home.html", http.StatusFound)
-			return
-
-		}else if EM != "" {
-			http.Redirect(w, r, "static/templates/register.html", http.StatusUnauthorized)
-			fmt.Println("Email already in use")
-			return
-		}
-	}else if UN != ""{
-
-		http.Redirect(w, r, "static/templates/register.html", http.StatusUnauthorized)
-		fmt.Println("Username already in use ")
+		tpl.ExecuteTemplate(w, "Home.html", "auth")
 		return
-	
 	}
-
-	http.Redirect(w, r, "static/templates/register.html", http.StatusFound)
-	return
+	tpl.ExecuteTemplate(w, "register.html", "mull")
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -304,7 +311,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == http.ErrNoCookie {
 
-			http.Redirect(w, r, "static/templates/login.html", http.StatusFound)
+			tpl.ExecuteTemplate(w, "login.html", "null")
 			return
 		}
 
@@ -317,19 +324,20 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	Usesh, exists := sessions[seshToken]
 	if !exists {
 
-		http.Redirect(w, r, "static/templates/login.html", http.StatusFound)
+		tpl.ExecuteTemplate(w, "index.html", "null")
 		return
 	}
 
 	if Usesh.Expired(){
 		delete(sessions, seshToken)
-		http.Redirect(w, r, "static/templates/login.html", http.StatusFound)
+
+		tpl.ExecuteTemplate(w, "index.html", "null")
 		return
 	}
 
-	http.Redirect(w, r, "static/templates/Home.html", http.StatusFound)
-	return
-	// tpl.ExecuteTemplate(w, "Home.html", "auth")
+
+	tpl.ExecuteTemplate(w, "Home.html", "auth")
+
 
 }
 
@@ -338,7 +346,7 @@ func SeshRefresh(w http.ResponseWriter, r *http.Request) {
 	cook, err := r.Cookie("Session_token")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			http.Redirect(w, r, "static/templates/login.html", http.StatusFound)
+			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
 		w.WriteHeader(http.StatusBadRequest)
@@ -348,7 +356,7 @@ func SeshRefresh(w http.ResponseWriter, r *http.Request) {
 
 	Usesh, exists := sessions[seshToken]
 	if !exists {
-		http.Redirect(w, r, "static/templates/login.html", http.StatusFound)
+		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
 
@@ -374,15 +382,21 @@ func SeshRefresh(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func IDX(w http.ResponseWriter, r *http.Request) {
+	tpl.ExecuteTemplate(w, "index.html", "null")
+}
+
 
 func main() {
 
 	tpl, _ = template.ParseGlob("./static/Templates/*html")
 
+	http.HandleFunc("/", IDX)
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/logout", logout)
 	http.HandleFunc("/Home", Home)
 	http.HandleFunc("/refresh", SeshRefresh)
+	http.HandleFunc("/register", Register)
 
 	log.Print("Listening....")
 	log.Fatal(http.ListenAndServe(":8080", nil))
