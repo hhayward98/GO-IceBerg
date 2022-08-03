@@ -1,0 +1,11 @@
+.Nbar {
+	float: right;
+}
+
+.Nbar li {
+	float: left;
+}
+
+.Nbar li a {
+	padding: 20px 15px;
+}
