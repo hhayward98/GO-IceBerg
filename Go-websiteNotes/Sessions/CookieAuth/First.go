@@ -69,7 +69,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	// set client cookie 
 	http.SetCookie(w, &http.Cookie{
-		Name: "Session_token"
+		Name: "Session_token",
 		Value: seshToken,
 		Expires: expiresAt,
 	})
@@ -104,7 +104,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 func secretPage(w http.ResponseWriter, r *http.Request) {
 	// get session token from request cookies
-	cook, err := r.Cookie("session_token")
+	cook, err := r.Cookie("Session_token")
 	if err != nil {
 		if err == http.ErrNoCookie {
 			//when no cookie is set return unauthorized
