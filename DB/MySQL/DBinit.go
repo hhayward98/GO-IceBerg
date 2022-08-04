@@ -1,15 +1,18 @@
-/*Initalizing Database to use with web app*/
-
-package main
+package main 
 
 import (
 	"database/sql"
 	"fmt"
 	"log"
 	"time"
-
+	"golang.org/x/crypto/bcrypt"
 	_ "github.com/go-sql-driver/mysql"
 )
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 16)
+	return string(bytes), err
+}
 
 func main() {
 
@@ -22,37 +25,31 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// _, err = db.Exec("CREATE DATABASE demon")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	_, err = db.Exec("USE demon")
+	_, err = db.Exec("USE goauth")
 	if err != nil {
 		log.Fatal(err)
 	}
-	// create tables
 
-	// {
-	// 	query:= `
-	// 		CREATE TABLE users (
-	// 			id INT AUTO_INCREMENT,
-	// 			username TEXT NOT NULL,
-	// 			password TEXT NOT NULL,
-	// 			email TEXT NOT NULL,
-	// 			created_at DATETIME,
-	// 			PRIMARY KEY (id)
-	// 		);`
 
-	// 	if _, err := db.Exec(query); err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// }
+	// user table 
+	{
+		query:= `
+			CREATE TABLE users (
+				id INT AUTO_INCREMENT,
+				username TEXT NOT NULL,
+				password TEXT NOT NULL,
+				email TEXT NOT NULL,
+				created_at DATETIME,
+				PRIMARY KEY (id)
+			);`
 
-	// create Admin and insert into database
+		if _, err := db.Exec(query); err != nil {
+			log.Fatal(err)
+		}
+	}
 	{
 		username := "Admin"
-		password := "Admin"
+		password, _ := HashPassword("Admin")
 		email := "Admin@boss.com"
 		createdAt := time.Now()
 
