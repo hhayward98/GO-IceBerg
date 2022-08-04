@@ -32,33 +32,98 @@ func main() {
 
 
 	// user table 
-	{
-		query:= `
-			CREATE TABLE users (
-				id INT AUTO_INCREMENT,
-				username TEXT NOT NULL,
-				password TEXT NOT NULL,
-				email TEXT NOT NULL,
-				created_at DATETIME,
-				PRIMARY KEY (id)
-			);`
+	// {
+	// 	query:= `
+	// 		CREATE TABLE users (
+	// 			id INT AUTO_INCREMENT,
+	// 			username TEXT NOT NULL,
+	// 			password TEXT NOT NULL,
+	// 			email TEXT NOT NULL,
+	// 			created_at DATETIME,
+	// 			PRIMARY KEY (id),
+	// 		);`
 
+	// 	if _, err := db.Exec(query); err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }
+
+	{
+		query := `
+			CREATE TABLE OGs (
+
+			    id INT,
+			    Suit TEXT NOT NULL,
+			    skin TEXT NOT NULL,
+			    Visor TEXT NOT NULL,
+			    Eye TEXT NOT NULL,
+			    oneyes TEXT NOT NULL,
+			   	Mouth TEXT NOT NULL,
+			    CTrait TEXT NOT NULL,
+			    chains TEXT NOT NULL,
+			    bk TEXT NOT NULL,
+			    PRIMARY KEY (id),
+
+			);`
 		if _, err := db.Exec(query); err != nil {
 			log.Fatal(err)
 		}
 	}
-	{
-		username := "Admin"
-		password, _ := HashPassword("Admin")
-		email := "Admin@boss.com"
-		createdAt := time.Now()
 
-		result, err := db.Exec(`INSERT INTO users (username, password, email, created_at) Values(?, ?, ?, ?)`, username, password, email, createdAt)
-		if err != nil {
+	{
+		query2 := `
+			CREATE TABLE Apes (
+
+			    id INT,
+			    Suit TEXT NOT NULL,
+			    skin TEXT NOT NULL,
+			    Visor TEXT NOT NULL,
+			    Eye TEXT NOT NULL,
+			    oneyes TEXT NOT NULL,
+			   	Mouth TEXT NOT NULL,
+			    CTrait TEXT NOT NULL,
+			    chains TEXT NOT NULL,
+			    bk TEXT NOT NULL,
+			    PRIMARY KEY (id),
+
+			);`
+		if _, err := db.Exec(query2); err != nil {
 			log.Fatal(err)
 		}
-
-		id, err := result.LastInsertId()
-		fmt.Println(id)
 	}
+	{
+		query3 := `
+			CREATE TABLE OGs (
+
+			    id INT,
+			    Suit TEXT NOT NULL,
+			    skin TEXT NOT NULL,
+			    Visor TEXT NOT NULL,
+			    Eye TEXT NOT NULL,
+			    oneyes TEXT NOT NULL,
+			   	Mouth TEXT NOT NULL,
+			    CTrait TEXT NOT NULL,
+			    chains TEXT NOT NULL,
+			    bk TEXT NOT NULL,
+			    PRIMARY KEY (id),
+
+			);`
+		if _, err := db.Exec(query3); err != nil {
+			log.Fatal(err)
+		}
+	}
+	// {
+	// 	username := "Admin"
+	// 	password, _ := HashPassword("Admin")
+	// 	email := "Admin@boss.com"
+	// 	createdAt := time.Now()
+
+	// 	result, err := db.Exec(`INSERT INTO users (username, password, email, created_at) Values(?, ?, ?, ?)`, username, password, email, createdAt)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+
+	// 	id, err := result.LastInsertId()
+	// 	fmt.Println(id)
+	// }
 }

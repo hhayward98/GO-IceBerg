@@ -151,36 +151,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "login.html", "null")
 
 
-
-	// if data.Password == "password"{
-
-
-	// 	seshToken := uuid.NewString()
-	// 	expiresAt := time.Now().Add(120 * time.Second)
-
-
-	// 	// add seshToken to session cach/database
-	// 	// since im not using cach/database
-	// 	// mapping to sessions map 
-	// 	sessions[seshToken] = Session{
-	// 		Authenticated: true,
-	// 		username: UNlower,
-	// 		expiry: expiresAt,
-	// 	}
-
-
-	// 	//set cookie
-	// 	http.SetCookie(w, &http.Cookie{
-	// 		Name: "Session_token",
-	// 		Value: seshToken,
-	// 		Expires: expiresAt,
-	// 	})
-	// 	tpl.ExecuteTemplate(w, "Home.html", "null")
-	// 	return
-
-	// }
-
-	// tpl.ExecuteTemplate(w, "login.html", "null")
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
@@ -349,31 +319,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// tpl.ExecuteTemplate(w, "register.html", "null")
-
-	// if data.Password == "password" {
-
-	// 	seshToken := uuid.NewString()
-	// 	expiresAt := time.Now().Add(120 * time.Second)
-
-
-	// 	sessions[seshToken] = Session{
-	// 		Authenticated: true,
-	// 		username: UNlower,
-	// 		expiry: expiresAt,
-	// 	}
-
-
-	// 	//set cookie
-	// 	http.SetCookie(w, &http.Cookie{
-	// 		Name: "Session_token",
-	// 		Value: seshToken,
-	// 		Expires: expiresAt,
-	// 	})
-
-	// 	tpl.ExecuteTemplate(w, "Home.html", "auth")
-	// 	return
-	// }
 	tpl.ExecuteTemplate(w, "register.html", "mull")
 
 
