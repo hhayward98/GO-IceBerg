@@ -150,7 +150,7 @@ func SearchID(NFT_Id string, collection int) {
 	    oneyes string
 	   	Mouth string
 	    CTrait string
-	    chains string
+	    Chains string
 	    bk string
 	)
 
@@ -161,15 +161,15 @@ func SearchID(NFT_Id string, collection int) {
 	defer query.Close()
 
 	for query.Next() {
-		err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
+		err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &Chains, &bk)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
+	NFT := [10]string{ID, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, Chains, bk}
 
-
-	// return info from database
+	return NFT
 
 }
 
@@ -210,6 +210,9 @@ func SearchTraits(data struct, collection int) {
 	    chains string
 	    bk string
 	)
+
+	// query the database for all NFTs with traits from data
+	
 
 	fmt.Println(data)
 }

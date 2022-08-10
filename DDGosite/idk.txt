@@ -1,0 +1,8 @@
+COPY go.mod go.sum ./
+RUN go mod download && go mod verify
+
+
+
+$ docker build -t dockerddd .
+
+$ docker-machine create -d amazonec2 --amazonec2-region us-west-2 --amazonec2-instance-type "t2.micro" --amazonec2-ssh-keypath ~/.ssh/id_rsa aws-new-cli-Name1

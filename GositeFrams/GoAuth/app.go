@@ -15,6 +15,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+
+
 var tpl *template.Template
 
 type LoginRequest struct {
@@ -207,6 +209,19 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 
 	_ = data
+
+	// regular expression for valid email 
+    if m, _ := regexp.MatchString(`^([\w\.\_]{2,10})@(\w{1,}).([a-z]{2,4})$`, r.Form.Get("email")); !m {
+        fmt.Println("no")
+    }else{
+        fmt.Println("yes")
+    }
+
+    // checks if username is empty
+    if len(r.Form["UserName"][0]) == 0 {
+    	fmt.Println("Username is empty")
+    }
+
 
 	UNlower := strings.ToLower(data.Username)
 
