@@ -2,17 +2,17 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	// "fmt"
 	"log"
-	"time"
-	"golang.org/x/crypto/bcrypt"
+	// "time"
+	// "golang.org/x/crypto/bcrypt"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 16)
-	return string(bytes), err
-}
+// func HashPassword(password string) (string, error) {
+// 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 16)
+// 	return string(bytes), err
+// }
 
 func main() {
 
@@ -25,7 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_, err = db.Exec("USE goauth")
+	_, err = db.Exec("USE asearch")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,12 +47,10 @@ func main() {
 	// 		log.Fatal(err)
 	// 	}
 	// }
-
 	{
 		query := `
 			CREATE TABLE OGs (
-
-			    id INT,
+			    id INT NOT NULL,
 			    Suit TEXT NOT NULL,
 			    skin TEXT NOT NULL,
 			    Visor TEXT NOT NULL,
@@ -62,19 +60,16 @@ func main() {
 			    CTrait TEXT NOT NULL,
 			    chains TEXT NOT NULL,
 			    bk TEXT NOT NULL,
-			    PRIMARY KEY (id),
+			    PRIMARY KEY (id));`
 
-			);`
 		if _, err := db.Exec(query); err != nil {
 			log.Fatal(err)
 		}
 	}
-
 	{
 		query2 := `
 			CREATE TABLE Apes (
-
-			    id INT,
+			    id INT NOT NULL,
 			    Suit TEXT NOT NULL,
 			    skin TEXT NOT NULL,
 			    Visor TEXT NOT NULL,
@@ -84,18 +79,16 @@ func main() {
 			    CTrait TEXT NOT NULL,
 			    chains TEXT NOT NULL,
 			    bk TEXT NOT NULL,
-			    PRIMARY KEY (id),
-
-			);`
+			    PRIMARY KEY (id));`
+		
 		if _, err := db.Exec(query2); err != nil {
 			log.Fatal(err)
 		}
 	}
 	{
 		query3 := `
-			CREATE TABLE OGs (
-
-			    id INT,
+			CREATE TABLE Pups (
+				id INT NOT NULL,
 			    Suit TEXT NOT NULL,
 			    skin TEXT NOT NULL,
 			    Visor TEXT NOT NULL,
@@ -105,9 +98,8 @@ func main() {
 			    CTrait TEXT NOT NULL,
 			    chains TEXT NOT NULL,
 			    bk TEXT NOT NULL,
-			    PRIMARY KEY (id),
-
-			);`
+			    PRIMARY KEY (id));`
+		
 		if _, err := db.Exec(query3); err != nil {
 			log.Fatal(err)
 		}

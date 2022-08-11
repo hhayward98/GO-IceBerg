@@ -6,10 +6,12 @@ import (
 	"github.com/astaxie/session"
 	"sync"
 	"time"
+	_ "github.com/astaxie/session/providers/memory"
 )
 var globalSessions *session.SManager
 var provides = make(map[string]Provider)
 // Session manager
+
 
 type SManager struct {
 	cookieName string
@@ -66,12 +68,12 @@ func (manager *SManager) SeshStart(w http.ResponseWriter, r *http.Request) (sess
 	cookie, err := r.Cookie(manager.cookieName)
 	if err != nil || cookie.Value == "" {
 		SeshId := manager.UseshID()
-		session, _ = manager.provider.SessionInit(SeshId)
+		session, _ = manager.provider.SeshInit(SeshId)
 		cookie := http.Cookie{Name: manager.cookieName, Value: url.QueryEscape(SeshId), Path: "/", HttpOnly: true, MaxAge: int(manager.maxLifeTime)}
 		http.SetCookie(w, &cookie)
 	} else {
 		SeshId, _ := url.QueryUnescape(cookie.Value)
-		session, _ = manager.provider.SessionRead(SeshId)
+		session, _ = manager.provider.SeshRead(SeshId)
 	}
 	return
 }
@@ -90,6 +92,25 @@ func init() {
 }
 
 
+func login(w http.ResponseWriter, r *http.Request) {
+	
+}
+
+func count(w http.ResponseWriter, r *http.Request) {
+	sesh := globalSessions.SeshStart(w, r)
+	ct := sesh.Get("Numcount")
+	// if no session Numcount
+	if ct == nil {
+		sesh.Set("Numcount", 1)
+	} else {
+		seash.Set("Numcount", (ct.(int) + 1))
+	}
+	t, _ := template.ParseFiles("count.gtpl")
+	w.Header().Set("Content-Type", "text/html")
+	t.Execute(w, sesh.Get("Numcount"))
+}
+
+
 // Protect from Session hijacking 
 //solution 1 
 //  only set session id's in cookies, instead of in URL rewrites
@@ -100,3 +121,24 @@ func init() {
 // Solution2 
 // create a time for every session, and replace expired session id's with new ones. 
 // dose not protect from sessions that are currently active. 
+
+
+// solution 3
+// HTTPS, TLS/SSL
+
+
+
+func main() {
+
+	http.HandleFunc("/count", count)
+
+	log.Print("Listening.........")
+	log.Fatal(http.ListenAndServe(":8080", nil))
+
+
+	// using TLS
+	// err := http.ListenAndServeTLS(":443", "server.crt", "server.key", nil)
+	// if err != nil {
+	// 		log.Fatal("ListenAndServe: ", err)
+	// }
+}

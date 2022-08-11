@@ -64,6 +64,7 @@ func (PD *Provider) SeshInit(SeshId string) (session.Session, error) {
 	PD.lock.Lock()
 	defer PD.lock.Unlock()
 	Val := make(mmap[interface{}]interface{}, 0)
+	
 	NewSesh := &SessionStore{SeshId: SeshId, timeAccessed: time.Now(), value: Val}
 	element := PD.list.PushBack(NewSesh)
 	PD.sessions[SeshId] = element
