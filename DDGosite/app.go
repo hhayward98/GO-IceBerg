@@ -5,36 +5,18 @@ import (
 	"log"
 	"fmt"
 	"strings"
-	// "crypto/sha256"
-	// "sync"
-	// "container/list"
+	// "regexp"
 	"html/template"
 	"net/mail"
 	"net/http"
 	"time"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/gorilla/sessions"
+	"github.com/google/uuid"
 	_ "github.com/go-sql-driver/mysql"
 
 )
 
 var tpl *template.Template 
-
-var (
-	key = []byte("923ef6d931b1d39b9db72a224567f080f3360c493ac72295378fcb43e8cda6c2")
-	store = sessions.NewCookieStore(key)
-	// user = nil
-	// store = sessions.NewCookieStore(user)
-)
-
-var store2 = sessions.NewCookieStore(
-	[]byte("new-Auth-key"),
-	[]byte("new-encryption-key"),
-	[]byte("old-auth-key"),
-	[]byte("old-encryption-key"),
-)
-
-
 
 type LoginRequest struct {
 	Username string
@@ -49,7 +31,25 @@ type RegisterDetails struct {
 	ConfPass string
 }
 
-func validateEmail(addy string) (strin, bool) {
+// use cach/database
+var sessions = map[string]Session{}
+
+
+// session Values
+type Session struct {
+	Authenticated bool
+	username string
+	expiry time.Time 
+}
+
+
+
+func (s Session) Expired() bool {
+	return s.expiry.Before(time.Now())
+}
+
+
+func validateEmail(addy string) (string, bool) {
 	addr, err := mail.ParseAddress(addy)
 	if err != nil {
 		return "", false
@@ -96,6 +96,8 @@ func QueryHandler(query string) bool{
 
 }
 
+
+
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 16)
 	return string(bytes), err
@@ -108,22 +110,10 @@ func CheckPasswordHash(password, hash string) bool {
 
 
 
-
-
-func loginPage(w http.ResponseWriter, r *http.Request) {
-
-	tmpl := template.Must(template.ParseFiles("static/Templates/Login.html"))
-
-	// session, _ := r.Cookie("cookie-name")
-
-	//add err
-
-	// sessionToken := "generate UI for sessions"
-
-
+func login(w http.ResponseWriter, r *http.Request) {
 
 	// connect to Database
-	db, err := sql.Open("goauth", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
+	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -131,19 +121,19 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	_, err = db.Exec("USE demon")
+	_, err = db.Exec("USE goauth")
 	if err != nil {
 	log.Fatal(err)
 	}
-
-	//
-	// tmpl.Execute(w, struct{ Success bool }{false})
 
 	data := LoginRequest{
 		Username: r.FormValue("UserName"),
 		Password: r.FormValue("PassWord"),
 
 	}
+	_ = data
+
+	UNlower := strings.ToLower(data.Username)
 
 	var (
 		
@@ -151,31 +141,9 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 		PW string
 		
 	)
-	
-	_ = data
-
-	fmt.Println(data)
-
-	// need to test for bugs
-	// test user input for "=-;:'"
-	// maybe temporary 
-	strcheck := QueryHandler(data.Username)
-
-	if strcheck == false{
-		// flash invalid use of chars "=-;:'"
-		fmt.Println("string Contains illegal characters")
-
-		//inform user that those chars are illegal
-
-		tmpl.Execute(w, struct{ Success bool }{true})
-	}
 
 
-	UNlower := strings.ToLower(data.Username)
-	// Cleanput := strings.Replace(data.Username)
-
-
-	// Query user from Database
+	// issues with database
 	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
 
 	defer userCheck.Close()
@@ -189,78 +157,96 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-
-	fmt.Println(UN)
-	fmt.Println(PW)
-
-
-	// if UN was in database this statment would pass
 	if UN == UNlower {
-	
-		// checks if user input the password correctly
-		Match := CheckPasswordHash(data.Password, PW)
+
+		if Match := CheckPasswordHash(data.Password, PW); Match == true{
+
+			seshToken := uuid.NewString()
+			expiresAt := time.Now().Add(120 * time.Second)
 
 
-		// auths the session and routs user to secret page
-		if Match == true {
-
-			session, _ := store.Get(r, "cookie-name")
-
-			// redirect user to secretpage
-			session.Values["authenticated"] = true
-			session.Values["User"] = UNlower
-			session.Save(r, w)
-
-			tpl.ExecuteTemplate(w, "secretPage.html", "auth")
+			// add seshToken to session cach/database
+			// since im not using cach/database
+			// mapping to sessions map 
+			sessions[seshToken] = Session{
+				Authenticated: true,
+				username: UNlower,
+				expiry: expiresAt,
+			}
 
 
-			// http.Redirect(w, r, "/secretPage", http.StatusFound)
+			//set cookie
+			http.SetCookie(w, &http.Cookie{
+				Name: "Session_token",
+				Value: seshToken,
+				Expires: expiresAt,
+			})
 
+			tpl.ExecuteTemplate(w, "secretPage.html", "null")
 			return
 
-		} else if Match == false {
-			// flash error message
-			// session.AddFlash("Invalid Password")
-			fmt.Println("Invalid Password")
-			tmpl.Execute(w, struct{ Success bool }{true})
 		}
-	}else {
-		// flash error message
-		// session.AddFlash("Invalid Username")
+
+		fmt.Println("Invalid Password")
+		tpl.ExecuteTemplate(w, "Login.html", "null")
+		return
+	} else if UN != UNlower {
+
 		fmt.Println("Invalid Username")
-		tmpl.Execute(w, struct{ Success bool }{true})
+		tpl.ExecuteTemplate(w, "Login.html", "null")
+		return
 	}
 
-	// tmpl.Execute(w, struct{ Success bool }{false})
+	tpl.ExecuteTemplate(w, "Login.html", "null")
+
+
+}
+
+func logout(w http.ResponseWriter, r *http.Request) {
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+
+			tpl.ExecuteTemplate(w, "index.html", "null")
+
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	seshToken := cook.Value
+
+	delete(sessions, seshToken)
+
+	http.SetCookie(w, &http.Cookie{
+		Name: "Session_token",
+		Value: "",
+		Expires: time.Now(),
+	})
+
+	tpl.ExecuteTemplate(w, "index.html", "null")
 
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("static/Templates/register.html"))
 
-	session, _ := store.Get(r, "cookie-name")
-
+	// connect to Database
 	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
-
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	if err := db.Ping(); err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = db.Exec("USE demon")
+	_, err = db.Exec("USE goauth")
 	if err != nil {
-		log.Fatal(err)
+	log.Fatal(err)
 	}
 
-	// -----------------------------
-	// tmpl.Execute(w, struct{ Success bool }{false})
-	// -----------------------------
 
-
-	// input from front end form
 	data := RegisterDetails{
 		Email: r.FormValue("email"),
 		Username: r.FormValue("UserName"),
@@ -268,39 +254,33 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		ConfPass: r.FormValue("pass2"),
 	}
 
-	// Variables to store Database values
+
+	_ = data
+
+	// // regular expression for valid email 
+ //    if m, _ := regexp.MatchString(`^([\w\.\_]{2,10})@(\w{1,}).([a-z]{2,4})$`, r.Form.Get("email")); !m {
+ //        fmt.Println("no")
+ //    }else{
+ //        fmt.Println("yes")
+ //    }
+
+ //    // checks if username is empty
+ //    if len(r.Form["UserName"][0]) == 0 {
+ //    	fmt.Println("Username is empty")
+ //    }
+
+
+	UNlower := strings.ToLower(data.Username)
 
 	var (
 		UN string
 		PW string
 		EM string
-
 	)
 
 
-	_ = data
-
-	fmt.Println(data)
-
-
-	strcheck := QueryHandler(data.Username)
-
-	if strcheck == false{
-		// flash invalid use of chars "=-;:'"
-		fmt.Println("string Contains illegal characters")
-
-		//inform user that those chars are illegal
-
-		tmpl.Execute(w, struct{ Success bool }{true})
-	}
-
-
-	UNlower := strings.ToLower(data.Username)
-
-	// Query database to see if username exist
 
 	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
-
 	defer userCheck.Close()
 
 	// scaning values from Database
@@ -312,13 +292,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	// could probally join query
-
 	EmailCheck, _ := db.Query(`SELECT email FROM users WHERE email = ?`, data.Email)
-	
-	// Vmail := validateEmail(EmailCheck).(bool)
-	// if Vmail 
-
 	defer EmailCheck.Close()
 
 	for EmailCheck.Next() {
@@ -328,10 +302,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-
-	// I can clean this up using some frontend code 
-
-	// if any values from the form are empty then the page informs the user
 	if data.Username != ""{
 		if data.Password != ""{
 			if data.ConfPass == data.Password {
@@ -353,133 +323,273 @@ func Register(w http.ResponseWriter, r *http.Request) {
 							id, err := result.LastInsertId()
 							fmt.Println(id)
 
+							seshToken := uuid.NewString()
+							expiresAt := time.Now().Add(120 * time.Second)
 
-							session.Values["authenticated"] = true
-							session.Values["User"] = UNlower
-							session.Save(r, w)
 
-							http.Redirect(w, r, "static/Templates/secretPage.html", http.StatusFound)
-							// tmpl := template.Must(template.ParseFiles("static/Templates/secretPage.html"))
-							// tmpl.Execute(w, session)
+							sessions[seshToken] = Session{
+								Authenticated: true,
+								username: UNlower,
+								expiry: expiresAt,
+							}
 
+
+							//set cookie
+							http.SetCookie(w, &http.Cookie{
+								Name: "Session_token",
+								Value: seshToken,
+								Expires: expiresAt,
+							})
+
+							tpl.ExecuteTemplate(w, "secretPage.html", "auth")
 							return
 
 
+
 						}else if EM != "" {
-							// flash email is not available
-							session.AddFlash("Email is not available")
-							tmpl.Execute(w, nil)
+
+							tpl.ExecuteTemplate(w, "register.html", "null")
 							fmt.Println("Email in already in use")
+							return
 
 						}
 					}else if UN != "" {
-						// flash username  is not available
-						session.AddFlash("Username is not available")
-						tmpl.Execute(w, nil)
+						tpl.ExecuteTemplate(w, "register.html", "null")
 						fmt.Println("Username is not available")
+						return
 					}
 
 				}else if data.Email == ""{
-					// flash email is empty
-					session.AddFlash("Email can not be empty")
-					tmpl.Execute(w, struct{ Success bool }{false})
+					tpl.ExecuteTemplate(w, "register.html", "null")
 					fmt.Println("Username is not available")
+					return
 				}
 			}else{
-				//flash password is not the same
-				session.AddFlash("password is not the same")
-				tmpl.Execute(w, struct{ Success bool }{false})
+				tpl.ExecuteTemplate(w, "register.html", "null")
 				fmt.Println("Passwords are not the same")
+				return
 			}
 
 		}else if data.Password == "" {
-			// flash password is empty
-			session.AddFlash("password can not be empty")
-			tmpl.Execute(w, struct{ Success bool }{false})
+			tpl.ExecuteTemplate(w, "register.html", "null")
 			fmt.Println("Password is empty")
+			return
 		}
 	}else if data.Username == "" {
-		// flasj Username is empty
-		session.AddFlash("Username can not be empty")
-		tmpl.Execute(w, struct{ Success bool }{false})
+		tpl.ExecuteTemplate(w, "register.html", "null")
 		fmt.Println("Username is empty")
+		return
 	}
-	
-	// tmpl.Execute(w, struct{ Success bool }{false})
+
+	tpl.ExecuteTemplate(w, "register.html", "mull")
+
+
 
 }
 
+func Home(w http.ResponseWriter, r *http.Request) {
 
-func logout(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+
+			tpl.ExecuteTemplate(w, "index.html", "null")
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	seshToken := cook.Value
+
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+
+		tpl.ExecuteTemplate(w, "index.html", "null")
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+
+		tpl.ExecuteTemplate(w, "index.html", "null")
+		return
+	}
+
+	tpl.ExecuteTemplate(w, "index.html", "auth")
+
+}
+
+func SeshRefresh(w http.ResponseWriter, r *http.Request) {
+
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	seshToken := cook.Value
+
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 
 
-	session.Values["authenticated"] = false
-	session.Values["User"] = nil
-	session.Save(r, w)
+	NewSeshToken := uuid.NewString()
+	expiresAt := time.Now().Add(120 * time.Second)
 
-	http.Redirect(w, r, "/", http.StatusFound)
+
+	sessions[NewSeshToken] = Session{
+		Authenticated: true,
+		username: Usesh.username,
+		expiry: expiresAt,
+	}
+
+	delete(sessions, seshToken)
+
+	http.SetCookie(w, &http.Cookie{
+		Name: "Session_token",
+		Value: seshToken,
+		Expires: time.Now().Add(120 * time.Second),
+	})
+
 
 }
 
 
 func secretPage(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
-	fmt.Println(session)
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
 
+			tpl.ExecuteTemplate(w, "Login.html", "null")
+			return
+		}
 
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-	test := session.Values["user"]
-	if test == nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
-	} 
-	// else if test is a registered user then 
+	seshToken := cook.Value
 
-	tmpl := template.Must(template.ParseFiles("static/templates/tools.html"))
+	Usesh, exists := sessions[seshToken]
+	if !exists {
 
-	tmpl.Execute(w, nil)
+		tpl.ExecuteTemplate(w, "Login.html", "null")
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+
+		tpl.ExecuteTemplate(w, "Login.html", "null")
+		return
+	}
+
+	tpl.ExecuteTemplate(w, "secretPage.html", "auth")
 
 }
 
 
 func ToolsPage(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
-	tmpl := template.Must(template.ParseFiles("static/templates/tools.html"))
-	// session, _ := store.Get(r, "cookie-name")
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
 
-	if session.Values["authenticated"] == true {
-		fmt.Println(session.Values["user"])
+			tpl.ExecuteTemplate(w, "tools.html", "null")
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
+	seshToken := cook.Value
 
-	tmpl.Execute(w, nil)
+	Usesh, exists := sessions[seshToken]
+	if !exists {
 
+		tpl.ExecuteTemplate(w, "tools.html", "null")
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+	}
+	tpl.ExecuteTemplate(w, "tools.html", "null")
 }
 
 func DAOPage(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
-	tmpl := template.Must(template.ParseFiles("static/templates/DemonDAO.html"))
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
 
+			tpl.ExecuteTemplate(w, "DemonDAO.html", "null")
+			return
+		}
 
-	if session.Values["authenticated"] == true {
-		fmt.Println(session.Values["user"])
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
-	
-	tmpl.Execute(w, nil)
+	seshToken := cook.Value
+
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+
+		tpl.ExecuteTemplate(w, "DemonDAO.html", "null")
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+
+		tpl.ExecuteTemplate(w, "DemonDAO.html", "null")
+		return
+	}
+
+	tpl.ExecuteTemplate(w, "DemonDAO.html", "null")
 }
 
-func Projects(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
-	tmpl := template.Must(template.ParseFiles("static/templates/Projects.html"))
 
-	
-	if session.Values["authenticated"] == true {
-		fmt.Println(session.Values["user"])
+
+
+func Projects(w http.ResponseWriter, r *http.Request) {
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+
+			tpl.ExecuteTemplate(w, "Projects.html", "null")
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
+	seshToken := cook.Value
 
-	tmpl.Execute(w, nil)
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+
+		tpl.ExecuteTemplate(w, "Projects.html", "null")
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+
+		tpl.ExecuteTemplate(w, "Projects.html", "null")
+		return
+	}
+	
+	tpl.ExecuteTemplate(w, "Projects.html", "null")
 }
 
 
@@ -487,10 +597,9 @@ func main() {
 
 	tpl, _ = template.ParseGlob("./static/Templates/*html")
 
-	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/", fs)
+	http.HandleFunc("/", Home)
 
-	http.HandleFunc("/login", loginPage)
+	http.HandleFunc("/login", login)
 	http.HandleFunc("/register", Register)
 
 	http.HandleFunc("/logout", logout)
@@ -503,10 +612,12 @@ func main() {
 
 
 
-	err := http.ListenAndServe(":8080", nil)
+	log.Print("Listening....")
+	err := http.ListenAndServeTLS(":9000", "localhost.crt", "localhost.key", nil)
 	if err != nil {
-		log.Fatal(err)
+			log.Fatal("ListenAndServe: ", err)
 	}
+
 
 }
 

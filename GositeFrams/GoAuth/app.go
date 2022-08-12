@@ -214,17 +214,17 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	_ = data
 
-	// regular expression for valid email 
-    if m, _ := regexp.MatchString(`^([\w\.\_]{2,10})@(\w{1,}).([a-z]{2,4})$`, r.Form.Get("email")); !m {
-        fmt.Println("no")
-    }else{
-        fmt.Println("yes")
-    }
+	// // regular expression for valid email 
+ //    if m, _ := regexp.MatchString(`^([\w\.\_]{2,10})@(\w{1,}).([a-z]{2,4})$`, r.Form.Get("email")); !m {
+ //        fmt.Println("no")
+ //    }else{
+ //        fmt.Println("yes")
+ //    }
 
-    // checks if username is empty
-    if len(r.Form["UserName"][0]) == 0 {
-    	fmt.Println("Username is empty")
-    }
+ //    // checks if username is empty
+ //    if len(r.Form["UserName"][0]) == 0 {
+ //    	fmt.Println("Username is empty")
+ //    }
 
 
 	UNlower := strings.ToLower(data.Username)
@@ -438,11 +438,10 @@ func main() {
 	http.HandleFunc("/register", Register)
 
 	log.Print("Listening....")
-	log.Fatal(http.ListenAndServe(":8080", nil))
-	
-	// err := http.ListenAndServeTLS(":443", "server.crt", "server.key", nil)
-	// if err != nil {
-	// 		log.Fatal("ListenAndServe: ", err)
-	// }
+	err := http.ListenAndServeTLS(":9000", "localhost.crt", "localhost.key", nil)
+	if err != nil {
+			log.Fatal("ListenAndServe: ", err)
+	}
+
 
 }
