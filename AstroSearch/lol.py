@@ -33,10 +33,10 @@ for i in range(len(pf)):
 	Name = tr['name']
 	atts = tr['attributes']
 	Numbers = Name.translate(DD)
-	strbuffer = strbuffer + str(Numbers + " ")
+	strbuffer = strbuffer + str(Numbers + ",")
 	for i in atts:
 		for key, value in i.items():
-			strbuffer = strbuffer + str(value)
+			strbuffer = strbuffer + str(value + ",")
 	AList.append(strbuffer)
 	strbuffer = ''
 
