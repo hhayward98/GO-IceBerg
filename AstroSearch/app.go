@@ -4,11 +4,11 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"strings"
+	// "strings"
 	"net/http"
 	"html/template"
 	"log"
-	"time"
+	// "time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -59,8 +59,8 @@ type Pups struct {
 func AstroOGs(w http.ResponseWriter, r *http.Request) {
 
 
-	data := LoginRequest{
-	    NFT_Id: r.FormValue("NFT_Id"),
+	data := OGs{
+	    NFT_id: r.FormValue("NFT_Id"),
 	    SS: r.FormValue("SS"),
 	    Skin: r.FormValue("Skin"),
 	    Visors: r.FormValue("Visors"),
@@ -71,14 +71,17 @@ func AstroOGs(w http.ResponseWriter, r *http.Request) {
 	    chains: r.FormValue("chains"),
 	    BK: r.FormValue("BK"),
 	}
+	_ = data
+
+	fmt.Println(data)
 
 	tpl.ExecuteTemplate(w, "OGs.html", "null")
 }
 
 func AstroApes(w http.ResponseWriter, r *http.Request) {
 
-	data := LoginRequest{
-	    NFT_Id: r.FormValue("NFT_Id"),
+	data := Apes{
+	    NFT_id: r.FormValue("NFT_Id"),
 	    SS: r.FormValue("SS"),
 	    Skin: r.FormValue("Skin"),
 	    Visors: r.FormValue("Visors"),
@@ -89,14 +92,17 @@ func AstroApes(w http.ResponseWriter, r *http.Request) {
 	    chains: r.FormValue("chains"),
 	    BK: r.FormValue("BK"),
 	}
+	_ = data
+
+	fmt.Println(data)
 
 	tpl.ExecuteTemplate(w, "Apes.html", "null")
 }
 
 func AstroPups(w http.ResponseWriter, r *http.Request) {
 
-	data := LoginRequest{
-	    NFT_Id: r.FormValue("NFT_Id"),
+	data := Pups{
+	    NFT_id: r.FormValue("NFT_Id"),
 	    SS: r.FormValue("SS"),
 	    Skin: r.FormValue("Skin"),
 	    Visors: r.FormValue("Visors"),
@@ -107,6 +113,9 @@ func AstroPups(w http.ResponseWriter, r *http.Request) {
 	    chains: r.FormValue("chains"),
 	    BK: r.FormValue("BK"),
 	}
+	_ = data
+
+	fmt.Println(data)
 
 	tpl.ExecuteTemplate(w, "Pups.html", "null")
 	
@@ -116,15 +125,15 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "index.html", "null")
 }
 
-func SearchID(NFT_Id string, collection int) {
+func SearchID(NFT_Id string, collection int) []string {
 	var Coll string
 
 	if collection == 0 {
-		Coll := "OGs"
+		Coll = "OGs"
 	}else if collection == 1 {
-		Coll := "Apes"
+		Coll = "Apes"
 	}else if collection == 2 {
-		Coll := "Pups"
+		Coll = "Pups"
 	}
 
 	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
@@ -167,66 +176,71 @@ func SearchID(NFT_Id string, collection int) {
 		}
 	}
 
-	NFT := [10]string{ID, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, Chains, bk}
+	NFT := []string{ID, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, Chains, bk}
 
 	return NFT
 
 }
 
-func SearchTraits(data struct, collection int) {
-	var Coll string
+// func SearchTraits(data , collection int) {
+// 	var Coll string
 
-	if collection == 0 {
-		Coll := "OGs"
-	}else if collection == 1 {
-		Coll := "Apes"
-	}else if collection == 2 {
-		Coll := "Pups"
-	}
+// 	if collection == 0 {
+// 		Coll = "OGs"
+// 	}else if collection == 1 {
+// 		Coll = "Apes"
+// 	}else if collection == 2 {
+// 		Coll = "Pups"
+// 	}
 	
-	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := db.Ping(); err != nil {
-		log.Fatal(err)
-	}
+// 	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	if err := db.Ping(); err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	_, err = db.Exec("USE astrosearch")
-	if err != nil {
-	log.Fatal(err)
-	}
+// 	_, err = db.Exec("USE astrosearch")
+// 	if err != nil {
+// 	log.Fatal(err)
+// 	}
 
-	var (
+// 	var (
 
-	    ID string 
-	    Suit string
-	    skin string
-	    Visor string
-	    Eye string
-	    oneyes string
-	   	Mouth string
-	    CTrait string
-	    chains string
-	    bk string
-	)
+// 	    ID string 
+// 	    Suit string
+// 	    skin string
+// 	    Visor string
+// 	    Eye string
+// 	    oneyes string
+// 	   	Mouth string
+// 	    CTrait string
+// 	    chains string
+// 	    bk string
+// 	)
 
-	// query the database for all NFTs with traits from data
+// 	// query the database for all NFTs with traits from data
 	
 
-	fmt.Println(data)
-}
+// 	fmt.Println(data)
+// }
+
 
 
 func main() {
 
 	tpl, _ = template.ParseGlob("./static/Templates/*html")
 
+	http.HandleFunc("/", Index)
 	http.HandleFunc("/AstroOGs", AstroOGs)
 	http.HandleFunc("/AstroApes", AstroApes)
 	http.HandleFunc("/AstroPups", AstroPups)
 
 	log.Print("Listening....")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	err := http.ListenAndServeTLS(":9000", "localhost.crt", "localhost.key", nil)
+	if err != nil {
+			log.Fatal("ListenAndServe: ", err)
+	}
 
 }

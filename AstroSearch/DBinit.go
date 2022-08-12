@@ -92,42 +92,42 @@ func main() {
 	// 	}
 	// }
 
-	readFile, err := os.Open("OGs.txt")
+	// readFile, err := os.Open("OGs.txt")
 
-	if err != nil {
-		fmt.Println(err)
-	}
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// fileScanner := bufio.NewScanner(readFile)
+	// fileScanner.Split(bufio.ScanLines)
 
-	var Sray []string
-	for fileScanner.Scan() {
-		Sray = append(Sray, fileScanner.Text())
+	// var Sray []string
+	// for fileScanner.Scan() {
+	// 	Sray = append(Sray, fileScanner.Text())
 
-	}
+	// }
 
 
-	for i, s := range Sray {
-		sl := strings.Split(s, ",")
-		fmt.Println(i, sl)
-		// 0		1  		2 		3  		4 				5		6 				7 		8  			 9 		10       	11 		12 			13 			14 			15 		16 			17 			18 
-		// [3793, Visors, No Visor, Hats, Two Side Hair, On Eyes, Yellow Goggles, Mouth, Mad Max Paint, Eyes, Blue Eyes, Chains, No Chain, Space Suits, Tattooed Suit, Skins, Zebra Skin, Backgrounds, Orange BG ]
+	// for i, s := range Sray {
+	// 	sl := strings.Split(s, ",")
+	// 	fmt.Println(i, sl)
+	// 	// 0		1  		2 		3  		4 				5		6 				7 		8  			 9 		10       	11 		12 			13 			14 			15 		16 			17 			18 
+	// 	// [3793, Visors, No Visor, Hats, Two Side Hair, On Eyes, Yellow Goggles, Mouth, Mad Max Paint, Eyes, Blue Eyes, Chains, No Chain, Space Suits, Tattooed Suit, Skins, Zebra Skin, Backgrounds, Orange BG ]
 		
 
-		if len(sl) > 12{
-			result, err := db.Exec(`INSERT IGNORE INTO OGs (id, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk) Values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, sl[0], sl[14], sl[16], sl[2], sl[10], sl[6], sl[8], sl[4], sl[12], sl[18])
-			if err != nil {
-				log.Fatal(err)
-			}
-			id, err := result.LastInsertId()
-			fmt.Println(id)
+	// 	if len(sl) > 12{
+	// 		result, err := db.Exec(`INSERT IGNORE INTO OGs (id, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk) Values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, sl[0], sl[14], sl[16], sl[2], sl[10], sl[6], sl[8], sl[4], sl[12], sl[18])
+	// 		if err != nil {
+	// 			log.Fatal(err)
+	// 		}
+	// 		id, err := result.LastInsertId()
+	// 		fmt.Println(id)
 
-		}
-		//Sl is a list of traits for each NFT with its id number at the start
-		// load sl in the database under the correct table
-	}
+	// 	}
+	// 	//Sl is a list of traits for each NFT with its id number at the start
+	// 	// load sl in the database under the correct table
+	// }
 
-	readFile.Close()
+	// readFile.Close()
 
 
 	// load 
@@ -135,13 +135,9 @@ func main() {
 
 	// {
 
+	// Create Table for image URL with NFT_id as the primary key (maybe)
+	// 
 
-	// 	result, err := db.Exec(`INSERT INTO OGs (id, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk) Values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, id, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
 
-	// 	id, err := result.LastInsertId()
-	// 	fmt.Println(id)
-	// }
+
 }

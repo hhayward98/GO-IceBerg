@@ -1,0 +1,21 @@
+Generating Private Keys and SSL Certs
+
+$ openssl req  -new  -newkey rsa:2048  -nodes  -keyout localhost.key  -out localhost.csr
+
+$ openssl  x509  -req  -days 365  -in localhost.csr  -signkey localhost.key  -out localhost.crt
+
+Store cert in trusted root:
+
+Windows:
+
+>certutil -addstore -f "ROOT" new-root-certificate.crt
+
+Linux:
+	
+	1. copy CA to dir /usr/local/share/ca-certificates/
+	2. $ sudo cp foo.crt /usr/local/share/ca-certificates/foo.crt
+	3. $ sudo update-ca-certificates
+
+Configuring HTTPS server:
+
+	log.Fatal( http.ListenAndServeTLS(":9000", "localhost.crt", "localhost.key", nil))
