@@ -430,6 +430,9 @@ func main() {
 
 	tpl, _ = template.ParseGlob("./static/Templates/*html")
 
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	
 	http.HandleFunc("/", IDX)
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/logout", logout)
