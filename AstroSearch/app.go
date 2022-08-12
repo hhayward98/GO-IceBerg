@@ -74,6 +74,12 @@ func AstroOGs(w http.ResponseWriter, r *http.Request) {
 	_ = data
 
 	fmt.Println(data)
+	if data.NFT_id != ""{
+		Q := SearchID(data.NFT_id, 0)
+		fmt.Println(Q)
+	}
+
+
 
 	tpl.ExecuteTemplate(w, "OGs.html", "null")
 }
