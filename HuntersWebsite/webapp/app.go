@@ -53,9 +53,9 @@ func RDP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	tpl, _ := template.ParseGlob("static/templates/*html")
+	tpl, _ = template.ParseGlob("static/templates/*html")
 
-	Ptpl, _ := template.ParseGlob("static/templates/Proj/*html")
+	Ptpl, _ = template.ParseGlob("static/templates/Proj/*html")
 
 
 	http.HandleFunc("/", Home)
@@ -68,6 +68,6 @@ func main() {
 
 	log.Print("Listening......")
 
-	lof.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 	
 }
