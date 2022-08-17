@@ -47,63 +47,6 @@ func main() {
 	// 		log.Fatal(err)
 	// 	}
 	// }
-	{
-		query := `
-			CREATE TABLE OGs (
-			    id INT NOT NULL,
-			    Suit TEXT NOT NULL,
-			    skin TEXT NOT NULL,
-			    Visor TEXT NOT NULL,
-			    Eye TEXT NOT NULL,
-			    oneyes TEXT NOT NULL,
-			   	Mouth TEXT NOT NULL,
-			    CTrait TEXT NOT NULL,
-			    chains TEXT NOT NULL,
-			    bk TEXT NOT NULL,
-			    PRIMARY KEY (id));`
-
-		if _, err := db.Exec(query); err != nil {
-			log.Fatal(err)
-		}
-	}
-	{
-		query2 := `
-			CREATE TABLE Apes (
-			    id INT NOT NULL,
-			    Suit TEXT NOT NULL,
-			    skin TEXT NOT NULL,
-			    Visor TEXT NOT NULL,
-			    Eye TEXT NOT NULL,
-			    oneyes TEXT NOT NULL,
-			   	Mouth TEXT NOT NULL,
-			    CTrait TEXT NOT NULL,
-			    chains TEXT NOT NULL,
-			    bk TEXT NOT NULL,
-			    PRIMARY KEY (id));`
-		
-		if _, err := db.Exec(query2); err != nil {
-			log.Fatal(err)
-		}
-	}
-	{
-		query3 := `
-			CREATE TABLE Pups (
-				id INT NOT NULL,
-			    Suit TEXT NOT NULL,
-			    skin TEXT NOT NULL,
-			    Visor TEXT NOT NULL,
-			    Eye TEXT NOT NULL,
-			    oneyes TEXT NOT NULL,
-			   	Mouth TEXT NOT NULL,
-			    CTrait TEXT NOT NULL,
-			    chains TEXT NOT NULL,
-			    bk TEXT NOT NULL,
-			    PRIMARY KEY (id));`
-		
-		if _, err := db.Exec(query3); err != nil {
-			log.Fatal(err)
-		}
-	}
 	// {
 	// 	username := "Admin"
 	// 	password, _ := HashPassword("Admin")
