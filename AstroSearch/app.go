@@ -236,7 +236,7 @@ func SearchID(NFT_Id string, collection int) []string {
 
 func main() {
 
-	tpl, _ = template.ParseGlob("./static/Templates/*html")
+	tpl, _ = template.ParseGlob("./static/templates/*html")
 
 	http.HandleFunc("/", Index)
 	http.HandleFunc("/AstroOGs", AstroOGs)

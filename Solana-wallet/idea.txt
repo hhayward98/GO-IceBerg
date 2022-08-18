@@ -1,0 +1,18 @@
+Idea 1:
+
+	Create/build private server use Kali as OS
+	
+		- Create Application software that connects to Solona mainnet.
+
+			User Auth:
+				- Store private keys for wallets, locked behind username/password authentication.
+				- allow Ledger support
+
+			Importing wallets:
+				- recover using passphrase 
+				- direct private key import
+
+			Functions:
+				- Run Demonic tools
+	
+	Synopsis: Application software using NFTs for Authentication
