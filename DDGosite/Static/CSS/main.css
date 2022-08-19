@@ -194,8 +194,39 @@ section{
 	padding-top: 50px;
 }
 
+.Mid p {
+    color: red;
+	padding-top: 5px;
+	padding-left: 50px;
+}
+.Mid button {
+    color: red;
+}
+
 .NAME{
 	color: red;
 	float: left;
 
+}
+
+.DDIMG {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+.DDimg {
+	max-height: 200px;
+	max-width: 200px;
+}
+
+/*.DDimg img {
+	max-height: 100%;
+	max-width: 100%;
+}*/
+
+.proj {
+	float: left;
+	max-height: 500px;
+	max-width: 500px;
 }

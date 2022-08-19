@@ -227,7 +227,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	})
 
 	tpl.ExecuteTemplate(w, "index.html", "null")
-
+	return
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -382,7 +382,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tpl.ExecuteTemplate(w, "register.html", "mull")
-
+	return
 
 
 }
@@ -418,6 +418,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tpl.ExecuteTemplate(w, "index.html", "auth")
+	return
 
 }
 
@@ -493,6 +494,7 @@ func secretPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tpl.ExecuteTemplate(w, "secretPage.html", "auth")
+	return
 
 }
 
@@ -523,6 +525,7 @@ func ToolsPage(w http.ResponseWriter, r *http.Request) {
 		delete(sessions, seshToken)
 	}
 	tpl.ExecuteTemplate(w, "tools.html", "null")
+	return
 }
 
 func DAOPage(w http.ResponseWriter, r *http.Request) {
@@ -555,6 +558,7 @@ func DAOPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tpl.ExecuteTemplate(w, "DemonDAO.html", "null")
+	return
 }
 
 
@@ -597,6 +601,7 @@ func main() {
 
 	tpl, _ = template.ParseGlob("./static/Templates/*html")
 
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/", Home)
 
 	http.HandleFunc("/login", login)
