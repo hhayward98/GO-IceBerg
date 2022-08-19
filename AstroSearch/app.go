@@ -82,6 +82,7 @@ func AstroOGs(w http.ResponseWriter, r *http.Request) {
 
 
 	tpl.ExecuteTemplate(w, "OGs.html", "null")
+	return
 }
 
 func AstroApes(w http.ResponseWriter, r *http.Request) {
@@ -101,8 +102,13 @@ func AstroApes(w http.ResponseWriter, r *http.Request) {
 	_ = data
 
 	fmt.Println(data)
+	if data.NFT_id != "" {
+		Q := SearchID(data.NFT_id, 1)
+		fmt.Println(Q)
+	}
 
 	tpl.ExecuteTemplate(w, "Apes.html", "null")
+	return
 }
 
 func AstroPups(w http.ResponseWriter, r *http.Request) {
@@ -122,8 +128,13 @@ func AstroPups(w http.ResponseWriter, r *http.Request) {
 	_ = data
 
 	fmt.Println(data)
+	if data.NFT_id != "" {
+		Q := SearchID(data.NFT_id, 2)
+		fmt.Println(Q)
+	}
 
 	tpl.ExecuteTemplate(w, "Pups.html", "null")
+	return
 	
 }
 
@@ -132,15 +143,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func SearchID(NFT_Id string, collection int) []string {
-	var Coll string
 
-	if collection == 0 {
-		Coll = "OGs"
-	}else if collection == 1 {
-		Coll = "Apes"
-	}else if collection == 2 {
-		Coll = "Pups"
-	}
+	var NFT []string
 
 	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
 	if err != nil {
@@ -150,7 +154,7 @@ func SearchID(NFT_Id string, collection int) []string {
 		log.Fatal(err)
 	}
 
-	_, err = db.Exec("USE astrosearch")
+	_, err = db.Exec("USE asearch")
 	if err != nil {
 	log.Fatal(err)
 	}
@@ -169,20 +173,56 @@ func SearchID(NFT_Id string, collection int) []string {
 	    bk string
 	)
 
-	query, err := db.Query(`SELECT NFT_ID FROM ? WHERE NFT_ID = ?`, Coll, NFT_Id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer query.Close()
-
-	for query.Next() {
-		err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &Chains, &bk)
+	if collection == 0 {
+		query, err := db.Query(`SELECT * FROM OGs WHERE id = ?`, NFT_Id)
 		if err != nil {
 			log.Fatal(err)
 		}
-	}
+		defer query.Close()
 
-	NFT := []string{ID, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, Chains, bk}
+		for query.Next() {
+			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &Chains, &bk)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		NFT := []string{ID, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, Chains, bk}
+		return NFT
+
+	} else if collection == 1 {
+		query, err := db.Query(`SELECT * FROM Apes WHERE id = ?`, NFT_Id)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer query.Close()
+
+		for query.Next() {
+			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &Chains, &bk)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		NFT := []string{ID, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, Chains, bk}
+		return NFT
+
+	} else if collection == 2 {
+
+		query, err := db.Query(`SELECT * FROM Pups WHERE id = ?`, NFT_Id)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer query.Close()
+
+		for query.Next() {
+			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &Chains, &bk)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+		NFT := []string{ID, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, Chains, bk}
+		return NFT
+	}
 
 	return NFT
 
@@ -244,9 +284,10 @@ func main() {
 	http.HandleFunc("/AstroPups", AstroPups)
 
 	log.Print("Listening....")
-	err := http.ListenAndServeTLS(":9000", "localhost.crt", "localhost.key", nil)
-	if err != nil {
-			log.Fatal("ListenAndServe: ", err)
-	}
+	log.Fatal(http.ListenAndServe(":8080", nil))
+	// err := http.ListenAndServeTLS(":9000", "localhost.crt", "localhost.key", nil)
+	// if err != nil {
+	// 		log.Fatal("ListenAndServe: ", err)
+	// }
 
 }
