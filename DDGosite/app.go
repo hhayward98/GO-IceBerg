@@ -43,6 +43,13 @@ type Session struct {
 }
 
 
+type InputError struct {
+	email string
+	username string
+	password string
+	ConfPass string
+}
+
 
 func (s Session) Expired() bool {
 	return s.expiry.Before(time.Now())
@@ -156,6 +163,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+	Eput := InputError{"","Invalid Username!!", "Invalid Password!!", "passwords do not Match!!"}
 
 	if UN == UNlower {
 
@@ -187,17 +195,22 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		fmt.Println("Invalid Password")
-		tpl.ExecuteTemplate(w, "Login.html", "null")
+		if len(data.Username) > 1 {
+			fmt.Println("Invalid Password")
+			tpl.ExecuteTemplate(w, "Login.html", Eput.password)
+			return
+		} 
+
+		tpl.ExecuteTemplate(w, "Login.html", "")
 		return
 	} else if UN != UNlower {
 
 		fmt.Println("Invalid Username")
-		tpl.ExecuteTemplate(w, "Login.html", "null")
+		tpl.ExecuteTemplate(w, "Login.html", Eput.username)
 		return
 	}
 
-	tpl.ExecuteTemplate(w, "Login.html", "null")
+	tpl.ExecuteTemplate(w, "Login.html", "")
 
 
 }
@@ -269,7 +282,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
  //    	fmt.Println("Username is empty")
  //    }
 
-
+ 	Eput := InputError{"Email already in use!!","Username already in use", "Password cant be empty", "passwords do not Match!!"}
 	UNlower := strings.ToLower(data.Username)
 
 	var (
@@ -348,40 +361,44 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 						}else if EM != "" {
 
-							tpl.ExecuteTemplate(w, "register.html", "null")
+							tpl.ExecuteTemplate(w, "register.html", Eput.email)
 							fmt.Println("Email in already in use")
 							return
 
 						}
 					}else if UN != "" {
-						tpl.ExecuteTemplate(w, "register.html", "null")
+						tpl.ExecuteTemplate(w, "register.html", Eput.username)
 						fmt.Println("Username is not available")
 						return
 					}
 
 				}else if data.Email == ""{
-					tpl.ExecuteTemplate(w, "register.html", "null")
+					tpl.ExecuteTemplate(w, "register.html", Eput.username)
 					fmt.Println("Username is not available")
 					return
 				}
 			}else{
-				tpl.ExecuteTemplate(w, "register.html", "null")
+				tpl.ExecuteTemplate(w, "register.html", Eput.ConfPass)
 				fmt.Println("Passwords are not the same")
 				return
 			}
 
 		}else if data.Password == "" {
-			tpl.ExecuteTemplate(w, "register.html", "null")
+			tpl.ExecuteTemplate(w, "register.html", Eput.password)
 			fmt.Println("Password is empty")
 			return
 		}
 	}else if data.Username == "" {
-		tpl.ExecuteTemplate(w, "register.html", "null")
-		fmt.Println("Username is empty")
+		if len(data.Email) > 1 {
+			tpl.ExecuteTemplate(w, "register.html", Eput.username)
+			fmt.Println("Username is empty")
+			return
+		}
+		tpl.ExecuteTemplate(w, "register.html", "")
 		return
 	}
 
-	tpl.ExecuteTemplate(w, "register.html", "mull")
+	tpl.ExecuteTemplate(w, "register.html", "")
 	return
 
 
