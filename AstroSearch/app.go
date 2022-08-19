@@ -77,6 +77,9 @@ func AstroOGs(w http.ResponseWriter, r *http.Request) {
 	if data.NFT_id != ""{
 		Q := SearchID(data.NFT_id, 0)
 		fmt.Println(Q)
+	} else {
+		Tlist := []string{data.SS, data.Skin, data.Visors, data.Eyes, data.OnEyes, data.mouth, data.Hats, data.chains, data.BK}
+		Q := SearchTraits(Tlist, 0)
 	}
 
 
@@ -105,6 +108,9 @@ func AstroApes(w http.ResponseWriter, r *http.Request) {
 	if data.NFT_id != "" {
 		Q := SearchID(data.NFT_id, 1)
 		fmt.Println(Q)
+	} else {
+		Tlist := []string{data.SS, data.Skin, data.Visors, data.Eyes, data.OnEyes, data.mouth, data.Tail, data.chains, data.BK}
+		Q := SearchTraits(Tlist, 1)
 	}
 
 	tpl.ExecuteTemplate(w, "Apes.html", "null")
@@ -131,6 +137,9 @@ func AstroPups(w http.ResponseWriter, r *http.Request) {
 	if data.NFT_id != "" {
 		Q := SearchID(data.NFT_id, 2)
 		fmt.Println(Q)
+	} else {
+		Tlist := []string{data.SS, data.Skin, data.Visors, data.Eyes, data.OnEyes, data.mouth, data.Earrings, data.chains, data.BK}
+		Q := SearchTraits(Tlist, 2)
 	}
 
 	tpl.ExecuteTemplate(w, "Pups.html", "null")
@@ -228,49 +237,89 @@ func SearchID(NFT_Id string, collection int) []string {
 
 }
 
-// func SearchTraits(data , collection int) {
-// 	var Coll string
+func SearchTraits(data []string , collection int) {
 
-// 	if collection == 0 {
-// 		Coll = "OGs"
-// 	}else if collection == 1 {
-// 		Coll = "Apes"
-// 	}else if collection == 2 {
-// 		Coll = "Pups"
-// 	}
+	var NFTList []
 	
-// 	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	if err := db.Ping(); err != nil {
-// 		log.Fatal(err)
-// 	}
+	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
 
-// 	_, err = db.Exec("USE astrosearch")
-// 	if err != nil {
-// 	log.Fatal(err)
-// 	}
+	_, err = db.Exec("USE asearch")
+	if err != nil {
+	log.Fatal(err)
+	}
 
-// 	var (
+	var (
 
-// 	    ID string 
-// 	    Suit string
-// 	    skin string
-// 	    Visor string
-// 	    Eye string
-// 	    oneyes string
-// 	   	Mouth string
-// 	    CTrait string
-// 	    chains string
-// 	    bk string
-// 	)
+	    ID string 
+	    Suit string
+	    skin string
+	    Visor string
+	    Eye string
+	    oneyes string
+	   	Mouth string
+	    CTrait string
+	    chains string
+	    bk string
+	)
 
-// 	// query the database for all NFTs with traits from data
+	if collection == 0 {
+
+		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer query.Close()
+
+		for query.Next() {
+			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &Chains, &bk)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+
+	}else if collection == 1 {
+
+		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer query.Close()
+
+		for query.Next() {
+			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &Chains, &bk)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+	}else if collection == 2 {
+
+		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer query.Close()
+
+		for query.Next() {
+			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &Chains, &bk)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+	}
+	// query the database for all NFTs with traits from data
 	
 
-// 	fmt.Println(data)
-// }
+	fmt.Println(data)
+}
 
 
 
