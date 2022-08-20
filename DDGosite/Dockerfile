@@ -12,9 +12,12 @@ WORKDIR /DDapp
 
 COPY go.* ./
 
-
+RUN go mod download && go mod verify
 
 #RUN go run app.go
-#RUN go build -o app .
+RUN go build -o app .
+
+EXPOSE 9000
+
 CMD ["/DDapp/app"]
 

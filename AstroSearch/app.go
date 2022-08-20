@@ -277,7 +277,7 @@ func SearchTraits(data []string , collection int) {
 		defer query.Close()
 
 		for query.Next() {
-			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &Chains, &bk)
+			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -293,7 +293,7 @@ func SearchTraits(data []string , collection int) {
 		defer query.Close()
 
 		for query.Next() {
-			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &Chains, &bk)
+			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -308,7 +308,7 @@ func SearchTraits(data []string , collection int) {
 		defer query.Close()
 
 		for query.Next() {
-			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &Chains, &bk)
+			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
 			if err != nil {
 				log.Fatal(err)
 			}
