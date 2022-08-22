@@ -107,6 +107,7 @@ func AstroApes(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(data)
 	if data.NFT_id != "" {
 		Q := SearchID(data.NFT_id, 1)
+		
 		fmt.Println(Q)
 	} else {
 		Tlist := []string{data.SS, data.Skin, data.Visors, data.Eyes, data.OnEyes, data.mouth, data.Tail, data.chains, data.BK}
@@ -251,7 +252,7 @@ func SearchTraits(data []string , collection int) {
 
 	_, err = db.Exec("USE asearch")
 	if err != nil {
-	log.Fatal(err)
+		log.Fatal(err)
 	}
 
 	var (
@@ -334,9 +335,5 @@ func main() {
 
 	log.Print("Listening....")
 	log.Fatal(http.ListenAndServe(":8080", nil))
-	// err := http.ListenAndServeTLS(":9000", "localhost.crt", "localhost.key", nil)
-	// if err != nil {
-	// 		log.Fatal("ListenAndServe: ", err)
-	// }
 
 }

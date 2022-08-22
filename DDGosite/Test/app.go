@@ -245,6 +245,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 func Register(w http.ResponseWriter, r *http.Request) {
 
+	
 	// connect to Database
 	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
 	if err != nil {
