@@ -613,6 +613,39 @@ func Projects(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "Projects.html", "null")
 }
 
+func members(w http.ResponseWriter, r *http.Request) {
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+
+			tpl.ExecuteTemplate(w, "members.html", "null")
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	seshToken := cook.Value
+
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+
+		tpl.ExecuteTemplate(w, "members.html", "null")
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+
+		tpl.ExecuteTemplate(w, "members.html", "null")
+		return
+	}
+	
+	tpl.ExecuteTemplate(w, "members.html", "null")
+}
+
+
 
 func main() {
 
