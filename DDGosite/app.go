@@ -142,6 +142,12 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	UNlower := strings.ToLower(data.Username)
 
+	if QueryHandler(UNlower) != true {
+		fmt.Println("invalid characters detected!!")
+
+
+	}
+
 	var (
 		
 		UN string
@@ -173,9 +179,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 			expiresAt := time.Now().Add(120 * time.Second)
 
 
-			// add seshToken to session cach/database
-			// since im not using cach/database
-			// mapping to sessions map 
 			sessions[seshToken] = Session{
 				Authenticated: true,
 				username: UNlower,
@@ -319,6 +322,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		if data.Password != ""{
 			if data.ConfPass == data.Password {
 				if data.Email != "" {
+
+					// if email is not valid 
+					Eaddy, valid := validateEmail(data.Email)
+					if valid == false {
+						tpl.ExecuteTemplate(w, "register.html", "Not a real Email Address")
+						fmt.Println(Eaddy, valid)
+						return
+					}
 
 					// if Username and Email do not exist in Database
 					// then the program hashes and stores the user and routs them to secret page
