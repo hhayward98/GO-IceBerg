@@ -20,6 +20,13 @@ type favthings struct {
 	T3 string
 }
 
+type InputForm struct{
+
+	
+
+}
+
+
 
 func Debugger(err error) {
 	if err != nil {
@@ -36,10 +43,25 @@ func Home(w http.ResponseWriter, r *http.Request) {
 func Page2(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Running Page2\n")
 
+		//connect to database
+	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
+	Debugger(err)
+
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec("USE aesir")
+	Debugger(err)
+
+	log.Print("Connected to DB")
+	
+
+
+
 }
 
 func AppRoutes() {
-
 
 	//testing for docker container
 	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

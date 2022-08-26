@@ -32,12 +32,12 @@ func main() {
 
 	// if SSL/TSL crt is not valid on server.
 
-	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	D.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 
 	// Send email
 
-	if err := d.DialAndSend(Msg); err != nil {
+	if err := D.DialAndSend(Msg); err != nil {
 		fmt.Println(err)
 		panic(err)
 	}
