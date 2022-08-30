@@ -20,12 +20,6 @@ type favthings struct {
 	T3 string
 }
 
-type InputForm struct{
-
-	
-
-}
-
 
 
 func Debugger(err error) {
@@ -37,6 +31,10 @@ func Debugger(err error) {
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Running Home Page\n")
+	
+	tmpl := template.Must(template.ParseFiles("static/templates/index.html"))
+	tmpl.Execute(w, "null")
+	return
 
 }
 
@@ -56,8 +54,25 @@ func Page2(w http.ResponseWriter, r *http.Request) {
 
 	log.Print("Connected to DB")
 	
+	Sdata := favthings{
+		Thing1: r.FormValue("T1")
+		Thing2: r.FormValue("T2")
+		Thing3: r.FormValue("T3")
 
+	}
 
+	data := InputForm {
+		Name: r.FormValue("Uname")
+		Color: r.FormValue("Color")
+		Fthings: Sdata
+	}
+
+	
+	
+	tmpl := template.Must(template.ParseFiles("static/templates/Page2.html"))
+	tmpl.Execute(w, "null")
+	log.Print("Running web-page")
+	return
 
 }
 
