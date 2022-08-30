@@ -30,6 +30,19 @@ func CreateDir() {
 	}
 }
 
+func InitAppHead() {
+	fmt.Println("Creating webapp File....")
+
+	f, err := os.Create("./app.go")
+	_, err2 := f.WriteString("package main\n\nimport ()\n\nfunc Home(w http.ResponseWriter, r *http.Response) {\n\tfmt.Println(`Home`)\n}\n\nfunc main() {\n\tfmt.Println(`hello`)\n}\n\n")
+	Pancheck(err)
+	Pancheck(err2)
+
+	defer f.Close()
+	fmt.Println("Done")
+
+}
+
 func InitDocker(){
 
 	// ask user for File name and replace AEsir with that var
