@@ -78,9 +78,35 @@ func WriteHTML(Fname string) {
 
 }
 
+func Options(){
+	fmt.Println("Enter H for HTML ")
+	fmt.Println("Enter D for Dockerfile ")
+
+}
+
 func main() {
 
+	var CHOICE string
+	// var TempNum int 
 	fmt.Println("Starting....")
+
+	fmt.Println("Welcome!!")
+	fmt.Println("Select option")
+	Options()
+	ans, err := fmt.Scanln(&CHOICE)
+	Pancheck(err)
+	fmt.Println(ans)
+
+	// if ans == "H" {
+	// 	fmt.Println("Enter the number of pages you want")
+	// 	Tnum, err := fmt.Scanln(&TempNum)
+	// 	InitTemplates(Tnum)
+	// }
+
+	// if ans == "D" {
+	// 	InitDocker()
+	// }
+
 	// InitTemplates(3)
 
 }
