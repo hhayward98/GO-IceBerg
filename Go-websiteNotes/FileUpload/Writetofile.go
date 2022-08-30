@@ -30,12 +30,24 @@ func CreateDir() {
 	}
 }
 
+func InitDocker(){
+
+	// ask user for File name and replace AEsir with that var
+	fmt.Println("Creating Docker File....")
+	f, err := os.Create("./Dockerfile")
+	_, err2 := f.WriteString("FROM golang:1.18\n\nRUN mkdir /GoWeb\n\nADD . /GoWeb\n\nWORKDIR /GoWeb\n\nCOPY go.* ./\n\nRUN go mod download && go mod verify\n\nRUN go build -o app .\n\nEXPOSE 8080\n\nCMD ['/GoWeb/app']")
+	Pancheck(err)
+	Pancheck(err2)
+
+	defer f.Close()
+	fmt.Println("Done")
+}
+
 func InitTemplates(Num int) {
+	fmt.Println("Creating Templates....")
 	if err := os.MkdirAll("./static/templates/", os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
-
-
 
 	if Num == 1 {
 		WriteHTML("index.html")
@@ -53,7 +65,6 @@ func InitTemplates(Num int) {
 	}
 
 	fmt.Println("Done")
-
 }
 
 func WriteHTML(Fname string) {
