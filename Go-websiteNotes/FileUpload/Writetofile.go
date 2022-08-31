@@ -45,7 +45,6 @@ func InitAppHead() {
 
 func InitDocker(){
 
-	// ask user for File name and replace AEsir with that var
 	fmt.Println("Creating Docker File....")
 	f, err := os.Create("./Dockerfile")
 	_, err2 := f.WriteString("FROM golang:1.18\n\nRUN mkdir /GoWeb\n\nADD . /GoWeb\n\nWORKDIR /GoWeb\n\nCOPY go.* ./\n\nRUN go mod download && go mod verify\n\nRUN go build -o app .\n\nEXPOSE 8080\n\nCMD ['/GoWeb/app']")
@@ -91,36 +90,53 @@ func WriteHTML(Fname string) {
 
 }
 
+func WriteCSS() {
+	fmt.Println("Creating CSS....")
+	if err := os.Mkdir("./static/css/", os.ModePerm); err != nil {
+		log.Fatal(err)
+	}
+
+	f, err := os.Create("./static/css/main.css")
+	_, err2 := f.WriteString("html {\n\t\n\t\n}\n\nhead {\n\t\n\t\n}\n\nbody {\n\t\n\t\n}\n\nfooter {\n\t\n\t\n}\n")
+	Pancheck(err)
+	Pancheck(err2)
+
+	defer f.Close()
+
+}
+
 func Options(){
-	fmt.Println("Enter H for HTML ")
-	fmt.Println("Enter D for Dockerfile ")
+	fmt.Println("Enter 1 for HTML ")
+	fmt.Println("Enter 2 for CSS ")
+	fmt.Println("Enter 4 for App.go")
+	fmt.Println("Enter 3 for Dockerfile")
 
 }
 
 func main() {
 
 	var CHOICE string
-	// var TempNum int 
+	var TempNum int 
 	fmt.Println("Starting....")
 
 	fmt.Println("Welcome!!")
 	fmt.Println("Select option")
 	Options()
-	ans, err := fmt.Scanln(&CHOICE)
-	Pancheck(err)
-	fmt.Println(ans)
+	fmt.Scanln(&CHOICE)
+	
 
-	// if ans == "H" {
-	// 	fmt.Println("Enter the number of pages you want")
-	// 	Tnum, err := fmt.Scanln(&TempNum)
-	// 	InitTemplates(Tnum)
-	// }
 
-	// if ans == "D" {
-	// 	InitDocker()
-	// }
-
-	// InitTemplates(3)
+	if CHOICE == 1 {
+		fmt.Println("Enter the number of pages you want")
+		fmt.Scanln(&TempNum)
+		InitTemplates(TempNum)
+	}else if CHOICE == 2 {
+		WriteCSS()
+	}else if CHOICE == 3 {
+		InitAppHead()
+	}else if CHOICE == 4 {
+		InitDocker()
+	}
 
 }
 
