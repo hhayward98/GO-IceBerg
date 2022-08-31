@@ -19,8 +19,6 @@ func main() {
 
 
 	http.HandleFunc("/", Home)
-	http.HandleFunc("/", Page0)
-	http.HandleFunc("/", Page1)
 
 	var globalSessions *session.Manager
 	tmpl := template.Must(template.ParseFiles("forms.html"))
