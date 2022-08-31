@@ -56,6 +56,27 @@ func (s Session) Expired() bool {
 }
 
 
+func Debugger(err error, Etype int) {
+	//err = error thrown
+	// Etype = Error type
+
+	// error type is determined by Developer, depending on how they want the program to respond when err != nil
+
+	if err != nil {
+		if Etype == 1 {
+			log.Fatal(err)
+		}else if Etype == 2 {
+			log.Print("===========================")
+			log.Print(err)
+			log.Print("===========================")
+			return
+		}else if Etype == 3 {
+			return
+		}
+	}
+}
+
+
 func validateEmail(addy string) (string, bool) {
 	addr, err := mail.ParseAddress(addy)
 	if err != nil {

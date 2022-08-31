@@ -1,7 +1,9 @@
 package main 
 
 import (
-	// "bufio"
+	"bufio"
+	// "reflect"
+	"strings"
 	"fmt"
 	"os"
 	"log"
@@ -15,10 +17,42 @@ func Pancheck(e error) {
 	}
 }
 
-func CreateFile() {
-	f, err := os.Create("./test.go")
+func LineByLine() {
+
+	var StrBuff string
+
+	f, err := os.Open("test.go")
 	Pancheck(err)
 
+	defer f.Close()
+	
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+
+		Temp := scanner.Text()
+
+		if strings.Contains(Temp, "main()") {
+
+			fmt.Println(Temp)
+		}
+
+		// fmt.Println(reflect.TypeOf(Temp))  
+	}
+
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func CreateFile() {
+	f, err := os.Create("./test.go")
+	_, err2 := f.WriteString("package main\n\nimport ()\n\nfunc Home(w http.ResponseWriter, r *http.Response) {\n\tfmt.Println(`Home`)\n}\n\nfunc main() {\n\n\n\tfmt.Println(`hello`)\n}\n\n")
+	Pancheck(err)
+	Pancheck(err2)
 	defer f.Close()
 
 	fmt.Println("Done")
@@ -115,7 +149,7 @@ func Options(){
 
 func main() {
 
-	var CHOICE string
+	var CHOICE int
 	var TempNum int 
 	fmt.Println("Starting....")
 
@@ -136,6 +170,9 @@ func main() {
 		InitAppHead()
 	}else if CHOICE == 4 {
 		InitDocker()
+	}else if CHOICE == 5 {
+		CreateFile()
+		LineByLine()
 	}
 
 }
