@@ -123,3 +123,6 @@ func main() {
 	// InitTemplates(3)
 
 }
+
+//Create unit test that test everything 
+// Create limited functionality and unit tests
