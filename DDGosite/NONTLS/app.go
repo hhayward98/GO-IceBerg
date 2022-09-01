@@ -31,7 +31,7 @@ type RegisterDetails struct {
 	ConfPass string
 }
 
-// use cach/database
+
 var sessions = map[string]Session{}
 
 
