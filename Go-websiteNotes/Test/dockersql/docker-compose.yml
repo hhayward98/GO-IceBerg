@@ -1,0 +1,25 @@
+version: '3'
+services:
+  db:
+    build:
+      context: ./database
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sqldock
+      MYSQL_USER: Test
+      MYSQL_PASSWORD: toor
+    container_name: go-test-db
+    ports:
+      - "3307:3307"
+    tty: true
+  app:
+    build:
+      context: ./Go
+    volumes:
+      - "./Go:/go"
+    container_name: go-test-app
+    ports:
+      - "8080:8080"
+    tty: true
+    depends_on:
+      - db

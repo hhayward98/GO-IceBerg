@@ -1,0 +1,35 @@
+
+Using following command to pull latest mysql docker image
+$sudo docker pull mysql/mysql-server:latest
+Deploy MySQL container 
+$sudo docker run --name=<container_name> -d <image_tag_name>
+Open logs to find root password 
+$sudo docker logs <container_name>
+Open docker container
+$docker exec -it <containerName> bash
+Start up mysql using root password found in logs
+$mysql -u root -p
+Change root password in mysql
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY '<password>';
+
+Create new user for testing
+mysql> CREATE USER 'test'@'localhost' IDENTIFIED BY 'toor';
+Give privileges
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'test'@'localhost' WITH GRANT OPTION;
+
+
+Configuring MySQL Container
+
+Create new dir on host machine
+$sudo mkdir -p /root/docker/[container_name]/conf.d
+
+$sudo vim /root/docker/[container_name]/conf.d/my-custom.cnf
+
+
+To connect to Docker container from host machine 
+We have to create a new user for that host machines IP
+I used the wildcard % to allow all IP to connect even though thats bad practice (It worked for now) 
+
+
+CREATE USER 'test'@'%' IDENTIFIED BY 'toor';
+GRANT ALL PRIVILEGES ON *.* TO 'test'@'%';
