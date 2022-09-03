@@ -25,6 +25,7 @@ $sudo mkdir -p /root/docker/[container_name]/conf.d
 
 $sudo vim /root/docker/[container_name]/conf.d/my-custom.cnf
 
+$mysql --host=127.0.0.1 --port=3307 -u root
 
 To connect to Docker container from host machine 
 We have to create a new user for that host machines IP
