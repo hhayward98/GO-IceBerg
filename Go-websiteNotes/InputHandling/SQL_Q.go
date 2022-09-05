@@ -2,54 +2,57 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"strings"
+
 )
 
-func SQLInjParse(query string) bool{
+type Test struct {
+	HTML string
+	Body string
+	foot string
+}
+
+func SLInjParse(query string) bool{
 	// testing for bugs
 
-	var Ichar = []string{"=","-",";",":","'"}
+	var Ichar = []string{"=","-",";",":","'","`"}
 
-	var i = 0
-	for i < len(Ichar){
-		res1 := strings.Contains(query, Ichar[i])
+
+	fmt.Println(query)
+	for i, obj := range Ichar {
+		fmt.Println(i, obj)
+		res1 := strings.Contains(query, obj)
 		if res1 == true{
+			// when res1 returns true the function loop ends 
 			return false
 		}else{
+			// so when res1 dose not contain the first value in list then function returns before checking others
 			return true
 		}
-		i++
 	}
-	// res1 := strings.Contains(query, "=")
- //    res2 := strings.Contains(query, "-")
- //    res3 := strings.Contains(query, ";")
- //    res4 := strings.Contains(query, ":")
- //    res5 := strings.Contains(query, "'")
-
- //    if res1 == true{
- //    	return false
- //    }else if res2 == true{
- //    	return false
- //    }else if res3 == true{
- //    	return false
- //    }else if res4 == true{
- //    	return false
- //    } else if res5 == true{
- //    	return false
- //    }else {
- //    	return true
- //    }
+	return false
 
 }
 
-func Home(w http.ResponseWriter, r *http.Request) {
-	log.Print("Running Home Page\n")
-
-}
 
 func main() {
 
-	http.HandleFunc("/", Home)
-	log.Print("Listening.....")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	var P = Test{HTML: "temp", Body: "", foot: "null"}
+	fmt.Println(P)
+	P.Body = "Testing"
+	fmt.Println("starting...")
+	fmt.Println(P)
+	T1 := SLInjParse("hello")
+	T2 := SLInjParse("WHILE 1 = 1, DELETE * FROM users")
+	T3 := SLInjParse("Lol'1+1=2';")
+	T4 := SLInjParse("1`create database`;")
+	T5 := SLInjParse(":32")
+
+	booLL := []bool{T1, T2, T3, T4, T5}
+
+	for i, obj := range booLL {
+		fmt.Println(i, obj)
+	}
+
+
 }
