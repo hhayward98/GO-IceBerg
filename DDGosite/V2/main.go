@@ -126,19 +126,19 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 
 	// 
-	if len(data.Username) == 0 {
-		if len(data.Password) == 0 {
+	if len(FormData.Username) == 0 {
+		if len(FormData.Password) == 0 {
 			// loading page should hit here
 			tpl.ExecuteTemplate(w, "login.html", Basic)
 			return
-		}else if (data.Password) > 0 {
+		}else if (FormData.Password) > 0 {
 			log.Print("username is empty")
 			Basic.Body = "Username can not be empty!"
 			tpl.ExecuteTemplate(w, "login.html", Basic)
 			return
 		}
-	}else if len(data.Username) > 0 {
-		if len(data.Password) == 0 {
+	}else if len(FormData.Username) > 0 {
+		if len(FormData.Password) == 0 {
 			log.Print("Password is empty")
 			Basic.Body = "Password can not be empty"
 			tpl.ExecuteTemplate(w, "login.html")
@@ -161,7 +161,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	if UN == UNlower {
 
-		if Match := CheckPasswordHash(data.Password, PW); Match == true{
+		if Match := CheckPasswordHash(FormData.Password, PW); Match == true{
 
 			// Sessions stuff changing next
 			seshToken := uuid.NewString()
@@ -223,7 +223,63 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		log.Print("Email is not valid!")
 		Basic.Body = "Email is not valid!"
 		tpl.ExecuteTemplate(w, "register.html", Basic)
+		return
 	}
+
+	if QueryHandler(UNlower) != true {
+		log.Print("invalid characters detected!!")
+		Basic.Body = "Illegal characters detected!!"
+		tpl.ExecuteTemplate(w, "login.html", Basic)
+		return
+	}
+
+
+	// checking form data 
+	if len(FormData.Email) == 0 {
+		if len(FormData.Username) == 0 {
+			if len(FormData.Password) == 0 {
+				if len(FormData.ConfPass) == 0 {
+					// 
+					tpl.ExecuteTemplate(w, "register.html", Basic)
+					return
+				}else {
+					log.Print("Information missing!")
+					Basic.Body = "missing Information!"
+					tpl.ExecuteTemplate(w, "register.html", Basic)
+					return
+				}
+			}
+		}
+		// While Email is empty 
+		log.Print("Email is empty")
+		Basic.Body = "Email can not be empty!"
+		tpl.ExecuteTemplate(w, "register.html", Basic)
+		return
+	}else if len(FormData.Email) > 1 {
+		if len(FormData.Username) > 1 {
+			if len(FormData.Password) > 1 {
+				if FormData.Password != FormData.ConfPass {
+					log.Print("Passwords do not match!")
+					Basic.Body = "Passwords do not match!"
+					tpl.ExecuteTemplate(w, "register.html", Basic)
+					return
+				}
+			}else if len(FormData.Password) == 0 {
+				log.Print("Password is Empty")
+				Basic.Body = "Password can not be empty"
+				tpl.ExecuteTemplate(w, "register.html", Basic)
+				return
+			}
+
+		}else if len(FormData.Username) == 0 {
+			log.Print("Username is Empty")
+			Basic.Body = "Username Can not be empty!"
+			tpl.ExecuteTemplate(w, "register.html", Basic)
+			return
+		}
+	}
+	// continues if form data is good
+
 
 	var (
 		UN string
@@ -247,8 +303,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Debugger(err, 1)
 	}
 
-	// ....
-	
+
+
 
 }
 
