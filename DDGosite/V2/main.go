@@ -3,10 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
+	"time"
 	"net/http"
+	"net/mail"
 	"html/template"
 	"database/sql"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/google/uuid"
 	_ "github.com/go-sql-driver/mysql"
 
 
@@ -59,11 +63,10 @@ func (s Session) Expired() bool {
 }
 
 func SeshRefresh(w http.ResponseWriter, r *http.Request) {
-	Basic := HTMLDATASET()
 	cook, err := r.Cookie("Session_token")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			http.Redirect(w, r, "/login", http.StatusFound)
+			http.Redirect(w, r, "/Login", http.StatusFound)
 			return
 		}
 		w.WriteHeader(http.StatusBadRequest)
@@ -73,7 +76,7 @@ func SeshRefresh(w http.ResponseWriter, r *http.Request) {
 
 	Usesh, exists := sessions[seshToken]
 	if !exists {
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Redirect(w, r, "/Login", http.StatusFound)
 		return
 	}
 
@@ -164,7 +167,7 @@ func QueryHandler(query string) bool{
 
 }
 
-func HTMLDATASET() {
+func HTMLDATASET() HTMLDATA{
 	data := HTMLDATA{
 		Header: "localhost:8080",
 		Body: "",
@@ -189,8 +192,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(Basic.Header)
 
 	FormData := LoginDetails{
-		Username: r.FormValue("UserName")
-		Password: r.FormValue("PassWord")
+		Username: r.FormValue("UserName"),
+		Password: r.FormValue("PassWord"),
 	}
 	_ = FormData
 
@@ -210,7 +213,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			// loading page should hit here
 			tpl.ExecuteTemplate(w, "login.html", Basic)
 			return
-		}else if (FormData.Password) > 0 {
+		}else if len(FormData.Password) > 0 {
 			log.Print("username is empty")
 			Basic.Body = "Username can not be empty!"
 			tpl.ExecuteTemplate(w, "login.html", Basic)
@@ -220,7 +223,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		if len(FormData.Password) == 0 {
 			log.Print("Password is empty")
 			Basic.Body = "Password can not be empty"
-			tpl.ExecuteTemplate(w, "login.html")
+			tpl.ExecuteTemplate(w, "login.html", Basic)
 			return
 		}
 	}
@@ -289,17 +292,18 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	Basic := HTMLDATASET()
 
 	FormData := RegisterDetails {
-		Email: r.FormValue("email")
-		Username: r.FormValue("UserName")
-		Password: r.FormValue("PassWord")
-		ConfPass: r.FormValue("ConfPass")
+		Email: r.FormValue("email"),
+		Username: r.FormValue("UserName"),
+		Password: r.FormValue("PassWord"),
+		ConfPass: r.FormValue("ConfPass"),
 	}
 	_ = FormData
 
 	UNlower := strings.ToLower(FormData.Username)
 	addy, BL := validateEmail(FormData.Email)
+
 	if BL == false {
-		log.Print("Email is not valid!")
+		log.Print("Email: " + addy +" is not valid!")
 		Basic.Body = "Email is not valid!"
 		tpl.ExecuteTemplate(w, "register.html", Basic)
 		return
@@ -375,7 +379,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Debugger(err, 1)
 	}
 
-	EmailCheck, _ := db.Query(`SELECT email FROM users WHERE email = ?`, data.Email)
+	EmailCheck, _ := db.Query(`SELECT email FROM users WHERE email = ?`, FormData.Email)
 	defer EmailCheck.Close()
 	for EmailCheck.Next() {
 		err := EmailCheck.Scan(&EM)
@@ -391,8 +395,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 			HashPass, err := HashPassword(FormData.Password)
 			Debugger(err, 2)
 
-			result, err := db.Exec(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`, UNlower, Hpass, data.Email)
+			result, err := db.Exec(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`, UNlower, HashPass, FormData.Email)
 			Debugger(err, 1)
+
+			id, err := result.LastInsertId()
+			log.Print(id)
 
 			seshToken := uuid.NewString()
 			expiresAt := time.Now().Add(120 * time.Second)
