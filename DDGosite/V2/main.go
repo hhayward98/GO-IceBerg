@@ -34,6 +34,76 @@ type HTMLDATA struct {
 }
 
 
+
+var sessions = map[string]Session{}
+
+
+// session Values
+type Session struct {
+	Authenticated bool
+	username string
+	expiry time.Time 
+}
+
+
+type InputError struct {
+	email string
+	username string
+	password string
+	ConfPass string
+}
+
+
+func (s Session) Expired() bool {
+	return s.expiry.Before(time.Now())
+}
+
+func SeshRefresh(w http.ResponseWriter, r *http.Request) {
+	Basic := HTMLDATASET()
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	seshToken := cook.Value
+
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
+
+	NewSeshToken := uuid.NewString()
+	expiresAt := time.Now().Add(120 * time.Second)
+
+
+	sessions[NewSeshToken] = Session{
+		Authenticated: true,
+		username: Usesh.username,
+		expiry: expiresAt,
+	}
+
+	delete(sessions, seshToken)
+
+	http.SetCookie(w, &http.Cookie{
+		Name: "Session_token",
+		Value: seshToken,
+		Expires: time.Now().Add(120 * time.Second),
+	})
+
+
+}
+
+
+
+
+
+
 func Debugger(err error, Etype int) {
 
 	if err != nil {
@@ -48,6 +118,15 @@ func Debugger(err error, Etype int) {
 	}
 }
 
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 16)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
 
 func validateEmail(addy string) (string, bool) {
 	addr, err := mail.ParseAddress(addy)
@@ -303,29 +382,186 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Debugger(err, 1)
 	}
 
+	// ....
+
+
+}
 
 
 
+func logout(w http.ResponseWriter, r *http.Request) {
+	log.Print("Loging user out...")
+	Basic := HTMLDATASET()
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+
+			tpl.ExecuteTemplate(w, "index.html", Basic)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	seshToken := cook.Value
+
+	delete(sessions, seshToken)
+
+	http.SetCookie(w, &http.Cookie{
+		Name: "Session_token",
+		Value: "",
+		Expires: time.Now(),
+	})
+
+	tpl.ExecuteTemplate(w, "index.html", Basic)
+	return
 }
 
 
 
 func ToolsPage(w http.ResponseWriter, r *http.Request) {
-	log.Print("Running ToolsPage")
+	log.Print("Running ToolsPage...")
 
 	Basic := HTMLDATASET()
 
-	tpl.ExecuteTemplate(w, "tools.html", Basic)
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
 
+			tpl.ExecuteTemplate(w, "tools.html", Basic)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	seshToken := cook.Value
+
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+
+		tpl.ExecuteTemplate(w, "tools.html", Basic)
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+	}
+	tpl.ExecuteTemplate(w, "tools.html", Basic)
+	return
+}
+
+
+func DAOPage(w http.ResponseWriter, r *http.Request) {
+	log.Print("Running DAOPage...")
+	Basic := HTMLDATASET()
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+
+			tpl.ExecuteTemplate(w, "DemonDAO.html", Basic)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	seshToken := cook.Value
+
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+
+		tpl.ExecuteTemplate(w, "DemonDAO.html", Basic)
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+
+		tpl.ExecuteTemplate(w, "DemonDAO.html", Basic)
+		return
+	}
+
+	tpl.ExecuteTemplate(w, "DemonDAO.html", Basic)
+	return
 }
 
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	log.Print("Running Home Page")
+	log.Print("Running Home Page...")
 
 	Basic := HTMLDATASET()
 
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+
+			tpl.ExecuteTemplate(w, "index.html", Basic)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	seshToken := cook.Value
+
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+
+		tpl.ExecuteTemplate(w, "index.html", Basic)
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+
+		tpl.ExecuteTemplate(w, "index.html", Basic)
+		return
+	}
+
 	tpl.ExecuteTemplate(w, "index.html", Basic)
+	return
+
+}
+
+func Projects(w http.ResponseWriter, r *http.Request) {
+	log.Print("Running Projects Page...")
+
+	Basic := HTMLDATASET()
+
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+
+			tpl.ExecuteTemplate(w, "Projects.html", Basic)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	seshToken := cook.Value
+
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+
+		tpl.ExecuteTemplate(w, "Projects.html", Basic)
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+
+		tpl.ExecuteTemplate(w, "Projects.html", Basic)
+		return
+	}
+	
+	tpl.ExecuteTemplate(w, "Projects.html", Basic)
 	return
 
 }
@@ -337,6 +573,11 @@ func AppRoutes() {
 	http.HandleFunc("/", Home)
 	http.HandleFunc("/Login", Login)
 	http.HandleFunc("/Register", Register)
+	http.HandleFunc("/Logout", logout)
+	http.HandleFunc("/Tools", ToolsPage)
+	http.HandleFunc("/Projects", Projects)
+	http.HandleFunc("/DemonDAO", DAOPage)
+
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
