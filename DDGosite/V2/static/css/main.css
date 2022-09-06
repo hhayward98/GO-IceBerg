@@ -1,0 +1,232 @@
+*{
+	box-sizing: border-box;
+}
+
+
+html{
+	background-color: black;
+	
+	
+}
+body{
+	
+	max-width: 1300px;
+	border: 5px solid black;
+	margin: auto;
+	max-height: 300px;
+	
+	
+}
+
+
+footer{
+	background-color: #6BA2C6;
+	border-top: 4px solid black;
+}
+
+
+
+header{
+	color: white;
+	font-size: 12px;
+	float: right;
+	
+
+
+}
+
+label {
+	color: red;
+}
+
+h1{
+	color: red;
+	
+	
+}
+
+h3{
+	padding: 10px 10px;
+}
+
+.aboutB{
+	margin: auto;
+
+}
+
+
+.main{
+	float: right;
+}
+.main li{
+	float: left;
+	list-style-type: none;
+}
+
+.main li a{
+	padding: 20px 15px;
+	text-decoration: none;
+	text-transform: uppercase;
+	border-right: 3px  solid black;
+	margin-left: 10px;
+	transition: all 0.3s linear;
+	color: white;
+	
+}
+
+.main li a:hover{
+	background-color: #ff0015;
+	border-radius: 20%;
+	width: 400px;
+}
+
+section{
+	padding: 10px 10px;
+} 
+
+
+.container{
+	
+}
+
+.logo{
+
+	position: absolute;
+	top: 75px;
+	left: 575px;
+	max-width: 350px;
+	max-height: 175px;
+	background-color: black;
+}
+
+.slogan{
+	text-align: center;
+	color: skyblue;
+	padding-top: 10px;
+	font-family: 'Cookie', cursive;
+	font-size: 40px;
+
+}
+
+.parallax {
+	background-image: url("../images/mainpic.JPG");
+
+	height: 800px;
+	background-attachment: fixed;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+
+
+.colpic{
+	max-width: 250px;
+	max-height: 200px;
+	border: 5px solid black;
+	
+	
+}
+.row{
+	padding-left: 100px;
+	padding-top: 50px;
+}
+
+.Placeholder{
+
+	background-color: red;
+}
+
+
+.maincol {
+
+	margin: auto;
+	float: left;
+	width: 25%;
+	
+}
+
+.mainrow {
+
+	display: flex;
+}
+
+
+.LoginForm {
+	align-content: center;
+	padding-top: 200px;
+}
+.LoginForm p {
+	color: red;
+}
+
+.RegisterForm {
+	align-content: center;
+
+	padding-top: 200px;
+
+
+}
+
+.Intro {
+	padding-top: 200px
+
+
+}
+
+.Top {
+	padding-top: 250px;
+}
+
+.Top h2 {
+	color: red;
+	padding-top: 50px;
+
+}
+
+.Top p {
+	color: red;
+	padding-top: 20px;
+	padding-left: 50px;
+}
+.Top h3 {
+	color: red;
+	padding-top: 50px;
+}
+
+.Mid p {
+    color: red;
+	padding-top: 5px;
+	padding-left: 50px;
+}
+.Mid button {
+    color: red;
+}
+
+.NAME{
+	color: red;
+	float: left;
+
+}
+
+.DDIMG {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+.DDimg {
+	max-height: 200px;
+	max-width: 200px;
+}
+
+/*.DDimg img {
+	max-height: 100%;
+	max-width: 100%;
+}*/
+
+.proj {
+	float: left;
+	max-height: 500px;
+	max-width: 500px;
+}

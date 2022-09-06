@@ -166,7 +166,7 @@ func QueryHandler(query string) bool{
 
 func HTMLDATASET() {
 	data := HTMLDATA{
-		Header: "hostmachineIPaddress",
+		Header: "localhost:8080",
 		Body: "",
 		Foot: "",
 	}
@@ -176,7 +176,7 @@ func HTMLDATASET() {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	log.Print("Running Login Page")
+	log.Print("Running Login Page...")
 
 	db, err := sql.Open("mysql", "test:toor@tcp(db:3306)/ddlabs")
 	Debugger(err, 1)
@@ -382,7 +382,50 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Debugger(err, 1)
 	}
 
-	// ....
+	
+	if UN == "" {
+
+		if EM == "" {
+
+
+			HashPass, err := HashPassword(FormData.Password)
+			Debugger(err, 2)
+
+			result, err := db.Exec(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`, UNlower, Hpass, data.Email)
+			Debugger(err, 1)
+
+			seshToken := uuid.NewString()
+			expiresAt := time.Now().Add(120 * time.Second)
+
+
+			sessions[seshToken] = Session{
+				Authenticated: true,
+				username: UNlower,
+				expiry: expiresAt,
+			}
+
+
+			//set cookie
+			http.SetCookie(w, &http.Cookie{
+				Name: "Session_token",
+				Value: seshToken,
+				Expires: expiresAt,
+			})
+
+			tpl.ExecuteTemplate(w, "secretPage.html", Basic)
+			return
+		}else if EM != ""{
+			log.Print("Email not available")
+			Basic.Body = "Email is Not available!"
+			tpl.ExecuteTemplate(w, "register.html", Basic)
+			return
+		}
+	}else if UN != "" {
+		log.Print("Username is not available")
+		Basic.Body = "Username is Not available!"
+		tpl.ExecuteTemplate(w, "register.html", Basic)
+		return
+	}
 
 
 }
