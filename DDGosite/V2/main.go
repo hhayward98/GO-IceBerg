@@ -206,28 +206,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-	// 
-	if len(FormData.Username) == 0 {
-		if len(FormData.Password) == 0 {
-			// loading page should hit here
-			tpl.ExecuteTemplate(w, "login.html", Basic)
-			return
-		}else if len(FormData.Password) > 0 {
-			log.Print("username is empty")
-			Basic.Body = "Username can not be empty!"
-			tpl.ExecuteTemplate(w, "login.html", Basic)
-			return
-		}
-	}else if len(FormData.Username) > 0 {
-		if len(FormData.Password) == 0 {
-			log.Print("Password is empty")
-			Basic.Body = "Password can not be empty"
-			tpl.ExecuteTemplate(w, "login.html", Basic)
-			return
-		}
-	}
-
 	var (
 		UN string
 		PW string	
@@ -241,11 +219,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Debugger(err, 1)
 	}
 
+
 	if UN == UNlower {
 
 		if Match := CheckPasswordHash(FormData.Password, PW); Match == true{
 
-			// Sessions stuff changing next
 			seshToken := uuid.NewString()
 			expiresAt := time.Now().Add(120 * time.Second)
 
@@ -263,18 +241,32 @@ func Login(w http.ResponseWriter, r *http.Request) {
 				Value: seshToken,
 				Expires: expiresAt,
 			})
-			log.Print("Login Success")
+
 			tpl.ExecuteTemplate(w, "secretPage.html", Basic)
 			return
 
-
 		}
-	}else if UN != UNlower {
-		log.Print("Invalid Username")
-		Basic.Body = "Invalid Username!"
+
+		if len(FormData.Username) > 1 {
+			log.Print("Invalid password")
+			Basic.Body = "Invalid Username or Password"
+			tpl.ExecuteTemplate(w, "login.html", Basic)
+			return
+		}
+
+		tpl.ExecuteTemplate(w, "login.html", Basic)
+		return
+	} else if UN != UNlower {
+
+		log.Print("Invalid username")
+		Basic.Body = "Invalid Username or Password"
 		tpl.ExecuteTemplate(w, "login.html", Basic)
 		return
 	}
+
+	tpl.ExecuteTemplate(w, "login.html", Basic)
+
+
 
 }
 
@@ -316,54 +308,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-	// checking form data 
-	if len(FormData.Email) == 0 {
-		if len(FormData.Username) == 0 {
-			if len(FormData.Password) == 0 {
-				if len(FormData.ConfPass) == 0 {
-					// 
-					tpl.ExecuteTemplate(w, "register.html", Basic)
-					return
-				}else {
-					log.Print("Information missing!")
-					Basic.Body = "missing Information!"
-					tpl.ExecuteTemplate(w, "register.html", Basic)
-					return
-				}
-			}
-		}
-		// While Email is empty 
-		log.Print("Email is empty")
-		Basic.Body = "Email can not be empty!"
-		tpl.ExecuteTemplate(w, "register.html", Basic)
-		return
-	}else if len(FormData.Email) > 1 {
-		if len(FormData.Username) > 1 {
-			if len(FormData.Password) > 1 {
-				if FormData.Password != FormData.ConfPass {
-					log.Print("Passwords do not match!")
-					Basic.Body = "Passwords do not match!"
-					tpl.ExecuteTemplate(w, "register.html", Basic)
-					return
-				}
-			}else if len(FormData.Password) == 0 {
-				log.Print("Password is Empty")
-				Basic.Body = "Password can not be empty"
-				tpl.ExecuteTemplate(w, "register.html", Basic)
-				return
-			}
-
-		}else if len(FormData.Username) == 0 {
-			log.Print("Username is Empty")
-			Basic.Body = "Username Can not be empty!"
-			tpl.ExecuteTemplate(w, "register.html", Basic)
-			return
-		}
-	}
-	// continues if form data is good
-
-
 	var (
 		UN string
 		PW string
@@ -386,54 +330,92 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Debugger(err, 1)
 	}
 
-	
-	if UN == "" {
+	if FormData.Username != ""{
+		if FormData.Password != ""{
+			if FormData.ConfPass == FormData.Password {
+				if FormData.Email != "" {
 
-		if EM == "" {
+					if UN == "" {
 
-
-			HashPass, err := HashPassword(FormData.Password)
-			Debugger(err, 2)
-
-			result, err := db.Exec(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`, UNlower, HashPass, FormData.Email)
-			Debugger(err, 1)
-
-			id, err := result.LastInsertId()
-			log.Print(id)
-
-			seshToken := uuid.NewString()
-			expiresAt := time.Now().Add(120 * time.Second)
+						if EM == "" {
 
 
-			sessions[seshToken] = Session{
-				Authenticated: true,
-				username: UNlower,
-				expiry: expiresAt,
+							HashPass, err := HashPassword(FormData.Password)
+							Debugger(err, 2)
+
+							result, err := db.Exec(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`, UNlower, HashPass, FormData.Email)
+							Debugger(err, 1)
+
+							id, err := result.LastInsertId()
+							log.Print(id)
+
+							seshToken := uuid.NewString()
+							expiresAt := time.Now().Add(120 * time.Second)
+
+
+							sessions[seshToken] = Session{
+								Authenticated: true,
+								username: UNlower,
+								expiry: expiresAt,
+							}
+
+
+							//set cookie
+							http.SetCookie(w, &http.Cookie{
+								Name: "Session_token",
+								Value: seshToken,
+								Expires: expiresAt,
+							})
+
+							tpl.ExecuteTemplate(w, "secretPage.html", Basic)
+							return
+
+						}else if EM != ""{
+							log.Print("Email not available")
+							Basic.Body = "Email is Not available!"
+							tpl.ExecuteTemplate(w, "register.html", Basic)
+							return
+						}
+					}else if UN != "" {
+						log.Print("Username is not available")
+						Basic.Body = "Username is Not available!"
+						tpl.ExecuteTemplate(w, "register.html", Basic)
+						return
+					}
+
+				}else if FormData.Email == ""{
+					log.Print("Email is empty")
+					Basic.Body = "Email can not be empty!"
+					tpl.ExecuteTemplate(w, "register.html", Basic)
+					return
+				}
+			}else{
+				log.Print("Passwords do not match!")
+				Basic.Body = "Passwords do not match!"
+				tpl.ExecuteTemplate(w, "register.html", Basic)
+				return
 			}
 
-
-			//set cookie
-			http.SetCookie(w, &http.Cookie{
-				Name: "Session_token",
-				Value: seshToken,
-				Expires: expiresAt,
-			})
-
-			tpl.ExecuteTemplate(w, "secretPage.html", Basic)
-			return
-		}else if EM != ""{
-			log.Print("Email not available")
-			Basic.Body = "Email is Not available!"
+		}else if FormData.Password == "" {
+			log.Print("Password is Empty")
+			Basic.Body = "Password can not be empty"
 			tpl.ExecuteTemplate(w, "register.html", Basic)
 			return
 		}
-	}else if UN != "" {
-		log.Print("Username is not available")
-		Basic.Body = "Username is Not available!"
+	}else if FormData.Username == "" {
+		if len(FormData.Email) > 1 {
+			log.Print("Username is Empty")
+			Basic.Body = "Username Can not be empty!"
+			tpl.ExecuteTemplate(w, "register.html", Basic)
+			return
+		}
 		tpl.ExecuteTemplate(w, "register.html", Basic)
 		return
 	}
 
+	tpl.ExecuteTemplate(w, "register.html", Basic)
+	return
+	
 
 }
 
@@ -511,7 +493,7 @@ func DAOPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == http.ErrNoCookie {
 
-			tpl.ExecuteTemplate(w, "DemonDAO.html", Basic)
+			tpl.ExecuteTemplate(w, "DemonicDAO.html", Basic)
 			return
 		}
 
@@ -524,18 +506,18 @@ func DAOPage(w http.ResponseWriter, r *http.Request) {
 	Usesh, exists := sessions[seshToken]
 	if !exists {
 
-		tpl.ExecuteTemplate(w, "DemonDAO.html", Basic)
+		tpl.ExecuteTemplate(w, "DemonicDAO.html", Basic)
 		return
 	}
 
 	if Usesh.Expired(){
 		delete(sessions, seshToken)
 
-		tpl.ExecuteTemplate(w, "DemonDAO.html", Basic)
+		tpl.ExecuteTemplate(w, "DemonicDAO.html", Basic)
 		return
 	}
 
-	tpl.ExecuteTemplate(w, "DemonDAO.html", Basic)
+	tpl.ExecuteTemplate(w, "DemonicDAO.html", Basic)
 	return
 }
 
@@ -616,6 +598,83 @@ func Projects(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func Services(w http.ResponseWriter, r *http.Request) {
+	log.Print("Running Services Page...")
+
+	Basic := HTMLDATASET()
+
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+
+			tpl.ExecuteTemplate(w, "Services.html", Basic)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	seshToken := cook.Value
+
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+
+		tpl.ExecuteTemplate(w, "Services.html", Basic)
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+
+		tpl.ExecuteTemplate(w, "Services.html", Basic)
+		return
+	}
+	
+	tpl.ExecuteTemplate(w, "Services.html", Basic)
+	return
+
+}
+
+
+func secretPage(w http.ResponseWriter, r *http.Request) {
+	log.Print("Running Projects Page...")
+
+	Basic := HTMLDATASET()
+
+	cook, err := r.Cookie("Session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+
+			tpl.ExecuteTemplate(w, "Login.html", Basic)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	seshToken := cook.Value
+
+	Usesh, exists := sessions[seshToken]
+	if !exists {
+
+		tpl.ExecuteTemplate(w, "Login.html", Basic)
+		return
+	}
+
+	if Usesh.Expired(){
+		delete(sessions, seshToken)
+
+		tpl.ExecuteTemplate(w, "Login.html", Basic)
+		return
+	}
+
+	tpl.ExecuteTemplate(w, "secretPage.html", Basic)
+	return
+
+}
+
 
 func AppRoutes() {
 
@@ -627,9 +686,10 @@ func AppRoutes() {
 	http.HandleFunc("/Tools", ToolsPage)
 	http.HandleFunc("/Projects", Projects)
 	http.HandleFunc("/DemonDAO", DAOPage)
+	http.HandleFunc("/SecretPage", secretPage)
 
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8088", nil))
 
 	//TLS
 	// err := http.ListenAndServeTLS(":9000", "localhost.crt", "localhost.key", nil)

@@ -1,50 +1,86 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Register</title>
-	<link rel="stylesheet" href="/static/css/main.css">
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Register</title>
+<link href='http://fonts.googleapis.com/css?family=Oswald:400,300' rel='stylesheet' type='text/css' />
+<link href='http://fonts.googleapis.com/css?family=Abel|Satisfy' rel='stylesheet' type='text/css' />
+<link href='https://fonts.googleapis.com/css?family=Cinzel' rel='stylesheet' type='text/css' />
+<link href="/static/css/global.css" rel="stylesheet" type="text/css" media="screen" />
 </head>
 <body>
+<div id="wrapper">
+	<div id="header-wrapper">
+		<div id="header" class="container">
+			<div id="logo">
+				<h1><a href="http://{{.Header}}/">Demonic Labs</a></h1>
+			</div>
+			<div id="menu">
+				<ul>
+					<li><a href="http://{{.Header}}/">Homepage</a></li>
+					<li><a href="http://{{.Header}}/Services">Services</a></li>
+					<li><a href="http://{{.Header}}/Tools">Tools</a></li>
+					<li><a href="http://{{.Header}}/Projects">Projects</a></li>
 
-	<a href="http://{{.Header}}/">
-		<h1 class="NAME">Demonic Labs</h1>
-	</a>
-	<nav class="main">
-		<header>
-			<ul>
-				<li><a href="http://{{.Header}}/Tools">Tools</a></li>
-				<li><a href="http://{{.Header}}/Projects">Projects</a></li>
-				<li><a href="http://{{.Header}}/Login">Login</a></li>
-				<li><a href="http://{{.Header}}/Register">Register</a></li>
-				<li><a href="http://{{.Header}}/Logout">Logout</a></li>
-			</ul>
-		</header>
-	</nav>
+				</ul>
+			</div>
+		</div>
+		<div id="banner">
+			<div class="content">
+				<div><img src="https://live.staticflickr.com/65535/52300486877_28f72d32b3_k.jpg" width="1000" height="450" alt="" /></div>
+			</div>
+		</div>
+	</div>
+	<br>
 
-	<a href="http://{{.Header}}/" >
-		<img src="https://live.staticflickr.com/65535/52300486877_28f72d32b3_k.jpg" alt="LOGO" class="logo"/>
-	</a>
+	<div id="page">
+		<div class="post">
 
-	<div>
-		<br>
+			<div class="Title">
+				<h2>Register</h2>
+				<p></p>
+			</div>
+		</div>
+	</div>
+	<div id="page">
+		<div class="post">
+
+			<div class="Title">
+				<h1>{{.Body}}</h1>
+
+				<form method="POST">
+					<label>Email:</label><br />
+					<input type="text" name="email"><br />
+					<label>Username</label><br />
+					<input type="username" name="UserName"><br />
+					<label>Password</label><br />
+					<input type="password" name="PassWord"><br />
+					<label>Confirm Password</label><br />
+					<input type="password" name="pass2"><br />
+					<input type="submit">
+				</form>
+				<p></p>
+			</div>
+		</div>
+	</div>
+	<div id="page">
+		<div class="post">
+
+			<div class="Title">
+				<h3>Back to Demonic DAO</h3>
+				<p><a href="http://{{.Header}}/DemonicDAO"> Link Here </a></p>
+			</div>
+		</div>
 	</div>
 
-	<div class = "RegisterForm">
-		<h1>{{.Body}}</h1>
-		<h1>Register</h1>
-		<form method="POST">
-			<label>Email:</label><br />
-			<input type="text" name="email"><br />
-			<label>Username</label><br />
-			<input type="username" name="UserName"><br />
-			<label>Password</label><br />
-			<input type="password" name="PassWord"><br />
-			<label>Confirm Password</label><br />
-			<input type="password" name="pass2"><br />
-			<input type="submit">
-		</form>
-	</div>	
+</div>
+
+<div id="footer">
+	<p> Images by Demonic-Labs. Design by <a href="http://demonic-labs.com" rel="nofollow">Demonic-Labs</a>.</p>
+</div>
+
 </body>
 </html>

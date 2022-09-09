@@ -15,5 +15,5 @@ ENTRYPOINT CompileDaemon --build="go build main.go" --command=./main
 
 EXPOSE 8088
 
-RUN go run main.go
+#RUN go run main.go
 
