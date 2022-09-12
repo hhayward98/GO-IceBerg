@@ -646,7 +646,7 @@ func secretPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == http.ErrNoCookie {
 
-			tpl.ExecuteTemplate(w, "Login.html", Basic)
+			tpl.ExecuteTemplate(w, "login.html", Basic)
 			return
 		}
 
@@ -659,14 +659,14 @@ func secretPage(w http.ResponseWriter, r *http.Request) {
 	Usesh, exists := sessions[seshToken]
 	if !exists {
 
-		tpl.ExecuteTemplate(w, "Login.html", Basic)
+		tpl.ExecuteTemplate(w, "login.html", Basic)
 		return
 	}
 
 	if Usesh.Expired(){
 		delete(sessions, seshToken)
 
-		tpl.ExecuteTemplate(w, "Login.html", Basic)
+		tpl.ExecuteTemplate(w, "login.html", Basic)
 		return
 	}
 
@@ -674,6 +674,7 @@ func secretPage(w http.ResponseWriter, r *http.Request) {
 	return
 
 }
+
 
 
 func AppRoutes() {
@@ -687,6 +688,7 @@ func AppRoutes() {
 	http.HandleFunc("/Projects", Projects)
 	http.HandleFunc("/DemonDAO", DAOPage)
 	http.HandleFunc("/SecretPage", secretPage)
+	http.HandleFunc("/Services", Services)
 
 
 	log.Fatal(http.ListenAndServe(":8088", nil))
