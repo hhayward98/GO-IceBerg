@@ -16,6 +16,20 @@ import (
 
 var tpl *template.Template
 
+type SBI_NFT struct {
+    NFT_id string 
+    SS string
+    Skin string
+    Visors string
+    Eyes string
+    OnEyes string
+    mouth string
+    Hats string
+    chains string
+    BK string
+    imgsrc string
+}
+
 type OGs struct {
     NFT_id string // could be int 
     SS string
@@ -58,6 +72,8 @@ type Pups struct {
 
 func AstroOGs(w http.ResponseWriter, r *http.Request) {
 
+	var NFT []string
+	var SearchByID bool
 
 	data := OGs{
 	    NFT_id: r.FormValue("NFT_Id"),
@@ -75,16 +91,24 @@ func AstroOGs(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(data)
 	if data.NFT_id != ""{
+		SearchByID = true
 		Q := SearchID(data.NFT_id, 0)
 		fmt.Println(Q)
+		NFT = Q
 	} else {
+		SearchByID = false
 		Tlist := []string{data.SS, data.Skin, data.Visors, data.Eyes, data.OnEyes, data.mouth, data.Hats, data.chains, data.BK}
-		Q := SearchTraits(Tlist, 0)
+		// Q := SearchTraits(Tlist, 0)
+		fmt.Println(Tlist)
 	}
 
+	fmt.Println(SearchByID)
+
+// if SearchID = true then use SBI_NFT struct and as the data input for ExecuteTemplate
+// need to query database table OG-imgSrc for image src of NFT and add to SBI_NFT struct along with other NFT-metadata
 
 
-	tpl.ExecuteTemplate(w, "OGs.html", "null")
+	tpl.ExecuteTemplate(w, "OGs.html", NFT)
 	return
 }
 
@@ -111,7 +135,8 @@ func AstroApes(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(Q)
 	} else {
 		Tlist := []string{data.SS, data.Skin, data.Visors, data.Eyes, data.OnEyes, data.mouth, data.Tail, data.chains, data.BK}
-		Q := SearchTraits(Tlist, 1)
+		// Q := SearchTraits(Tlist, 1)
+		fmt.Println(Tlist)
 	}
 
 	tpl.ExecuteTemplate(w, "Apes.html", "null")
@@ -140,7 +165,8 @@ func AstroPups(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(Q)
 	} else {
 		Tlist := []string{data.SS, data.Skin, data.Visors, data.Eyes, data.OnEyes, data.mouth, data.Earrings, data.chains, data.BK}
-		Q := SearchTraits(Tlist, 2)
+		// Q := SearchTraits(Tlist, 2)
+		fmt.Println(Tlist)
 	}
 
 	tpl.ExecuteTemplate(w, "Pups.html", "null")
@@ -240,7 +266,7 @@ func SearchID(NFT_Id string, collection int) []string {
 
 func SearchTraits(data []string , collection int) {
 
-	var NFTList []
+
 	
 	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
 	if err != nil {

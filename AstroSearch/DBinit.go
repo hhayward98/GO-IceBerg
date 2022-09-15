@@ -141,3 +141,75 @@ func main() {
 
 
 }
+
+
+
+
+// ========================
+// 		Structure
+// ========================
+
+
+// Database: Asearch
+// 
+// 	Tables: 
+
+// 		OGs: {
+// 		    id INT NOT NULL,
+// 		    Suit TEXT NOT NULL,
+// 		    skin TEXT NOT NULL,
+// 		    Visor TEXT NOT NULL,
+// 		    Eye TEXT NOT NULL,
+// 		    oneyes TEXT NOT NULL,
+// 		   	Mouth TEXT NOT NULL,
+// 		    CTrait TEXT NOT NULL,
+// 		    chains TEXT NOT NULL,
+// 		    bk TEXT NOT NULL,
+// 		    PRIMARY KEY (id));
+//		}
+
+//		Apes: {
+// 		    id INT NOT NULL,
+// 		    Suit TEXT NOT NULL,
+// 		    skin TEXT NOT NULL,
+// 		    Visor TEXT NOT NULL,
+// 		    Eye TEXT NOT NULL,
+// 		    oneyes TEXT NOT NULL,
+// 		   	Mouth TEXT NOT NULL,
+// 		    CTrait TEXT NOT NULL,
+// 		    chains TEXT NOT NULL,
+// 		    bk TEXT NOT NULL,
+// 		    PRIMARY KEY (id));
+//		}
+
+
+//		Pups: {
+// 		    id INT NOT NULL,
+// 		    Suit TEXT NOT NULL,
+// 		    skin TEXT NOT NULL,
+// 		    Visor TEXT NOT NULL,
+// 		    Eye TEXT NOT NULL,
+// 		    oneyes TEXT NOT NULL,
+// 		   	Mouth TEXT NOT NULL,
+// 		    CTrait TEXT NOT NULL,
+// 		    chains TEXT NOT NULL,
+// 		    bk TEXT NOT NULL,
+// 		    PRIMARY KEY (id));
+//		}
+
+// 		OG-img: {
+// 			id INT NOT NULL,
+// 			imgSrc TEXT NOT NULL,
+// 			PRIMARY KEY (id));
+// 		}
+// 		Apes-img: {
+// 			id INT NOT NULL,
+// 			imgSrc TEXT NOT NULL,
+// 			PRIMARY KEY (id));
+// 		}
+// 		Pups-img: {
+// 			id INT NOT NULL,
+// 			imgSrc TEXT NOT NULL,
+// 			PRIMARY KEY (id));
+// 		}
+
