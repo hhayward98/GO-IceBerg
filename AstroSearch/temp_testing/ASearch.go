@@ -95,86 +95,86 @@ func SearchID(NFT_Id string, collection int) []string {
 
 
 
-func SearchTraits(data []string , collection int) {
+// func SearchTraits(data []string , collection int) {
 
-	var NFTList []
+// 	var NFTList []
 	
-	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := db.Ping(); err != nil {
-		log.Fatal(err)
-	}
+// 	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	if err := db.Ping(); err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	_, err = db.Exec("USE asearch")
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	_, err = db.Exec("USE asearch")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	var (
+// 	var (
 
-	    ID string 
-	    Suit string
-	    skin string
-	    Visor string
-	    Eye string
-	    oneyes string
-	   	Mouth string
-	    CTrait string
-	    chains string
-	    bk string
-	)
+// 	    ID string 
+// 	    Suit string
+// 	    skin string
+// 	    Visor string
+// 	    Eye string
+// 	    oneyes string
+// 	   	Mouth string
+// 	    CTrait string
+// 	    chains string
+// 	    bk string
+// 	)
 
-	if collection == 0 {
+// 	if collection == 0 {
 
-		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer query.Close()
+// 		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		defer query.Close()
 
-		for query.Next() {
-			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+// 		for query.Next() {
+// 			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
+// 			if err != nil {
+// 				log.Fatal(err)
+// 			}
+// 		}
 
 
-	}else if collection == 1 {
+// 	}else if collection == 1 {
 
-		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer query.Close()
+// 		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		defer query.Close()
 
-		for query.Next() {
-			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+// 		for query.Next() {
+// 			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
+// 			if err != nil {
+// 				log.Fatal(err)
+// 			}
+// 		}
 
-	}else if collection == 2 {
+// 	}else if collection == 2 {
 
-		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer query.Close()
+// 		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		defer query.Close()
 
-		for query.Next() {
-			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+// 		for query.Next() {
+// 			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
+// 			if err != nil {
+// 				log.Fatal(err)
+// 			}
+// 		}
 
-	}
-	// query the database for all NFTs with traits from data
+// 	}
+// 	// query the database for all NFTs with traits from data
 	
 
-	fmt.Println(data)
-}
+// 	fmt.Println(data)
+// }
