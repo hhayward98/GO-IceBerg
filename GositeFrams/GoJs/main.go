@@ -17,6 +17,14 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+
+func Page2(w http.ResponseWriter, r *http.Request) {
+	log.Print("Running Page2")
+
+	tpl.ExecuteTemplate(w, "Page2.html", "")
+	return
+}
+
 func main() {
 
 	tpl, _ = template.ParseGlob("./static/Templates/*html")
