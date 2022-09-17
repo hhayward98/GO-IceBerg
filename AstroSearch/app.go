@@ -95,21 +95,36 @@ func AstroOGs(w http.ResponseWriter, r *http.Request) {
 		Q := SearchID(data.NFT_id, 0)
 		fmt.Println(Q)
 		NFT = Q
+		var FoundNFT = SBI_NFT{
+		    NFT_id: NFT[0], 
+		    SS: NFT[1],
+		    Skin: NFT[2],
+		    Visors: NFT[3],
+		    Eyes: NFT[4],
+		    OnEyes: NFT[5],
+		    mouth: NFT[6],
+		    Hats: NFT[7],
+		    chains: NFT[8],
+		    BK: NFT[9],
+		    imgsrc: "",
+		}
+
+		tpl.ExecuteTemplate(w, "OGs.html", FoundNFT)
+		return
 	} else {
 		SearchByID = false
 		Tlist := []string{data.SS, data.Skin, data.Visors, data.Eyes, data.OnEyes, data.mouth, data.Hats, data.chains, data.BK}
 		// Q := SearchTraits(Tlist, 0)
 		fmt.Println(Tlist)
 	}
+	// fmt.Println(NFT[0])
 
 	fmt.Println(SearchByID)
 
 // if SearchID = true then use SBI_NFT struct and as the data input for ExecuteTemplate
 // need to query database table OG-imgSrc for image src of NFT and add to SBI_NFT struct along with other NFT-metadata
 
-
 	tpl.ExecuteTemplate(w, "OGs.html", NFT)
-	return
 }
 
 func AstroApes(w http.ResponseWriter, r *http.Request) {
@@ -175,7 +190,11 @@ func AstroPups(w http.ResponseWriter, r *http.Request) {
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	tpl.ExecuteTemplate(w, "index.html", "null")
+
+	tmpl := template.Must(template.ParseFiles("static/templates/index.html"))
+
+	tmpl.Execute(w, nil)
+	return
 }
 
 func SearchID(NFT_Id string, collection int) []string {
@@ -264,89 +283,89 @@ func SearchID(NFT_Id string, collection int) []string {
 
 }
 
-func SearchTraits(data []string , collection int) {
+// func SearchTraits(data []string , collection int) {
 
 
 	
-	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := db.Ping(); err != nil {
-		log.Fatal(err)
-	}
+// 	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	if err := db.Ping(); err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	_, err = db.Exec("USE asearch")
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	_, err = db.Exec("USE asearch")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	var (
+// 	var (
 
-	    ID string 
-	    Suit string
-	    skin string
-	    Visor string
-	    Eye string
-	    oneyes string
-	   	Mouth string
-	    CTrait string
-	    chains string
-	    bk string
-	)
+// 	    ID string 
+// 	    Suit string
+// 	    skin string
+// 	    Visor string
+// 	    Eye string
+// 	    oneyes string
+// 	   	Mouth string
+// 	    CTrait string
+// 	    chains string
+// 	    bk string
+// 	)
 
-	if collection == 0 {
+// 	if collection == 0 {
 
-		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer query.Close()
+// 		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		defer query.Close()
 
-		for query.Next() {
-			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+// 		for query.Next() {
+// 			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
+// 			if err != nil {
+// 				log.Fatal(err)
+// 			}
+// 		}
 
 
-	}else if collection == 1 {
+// 	}else if collection == 1 {
 
-		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer query.Close()
+// 		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		defer query.Close()
 
-		for query.Next() {
-			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+// 		for query.Next() {
+// 			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
+// 			if err != nil {
+// 				log.Fatal(err)
+// 			}
+// 		}
 
-	}else if collection == 2 {
+// 	}else if collection == 2 {
 
-		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer query.Close()
+// 		query, err := db.Query(`SELECT * FROM OGs WHERE Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, chains, bk = (?,?,?,?,?,?,?,?,?)`, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		defer query.Close()
 
-		for query.Next() {
-			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+// 		for query.Next() {
+// 			err := query.Scan(&ID, &Suit, &skin, &Visor, &Eye, &oneyes, &Mouth, &CTrait, &chains, &bk)
+// 			if err != nil {
+// 				log.Fatal(err)
+// 			}
+// 		}
 
-	}
-	// query the database for all NFTs with traits from data
+// 	}
+// 	// query the database for all NFTs with traits from data
 	
 
-	fmt.Println(data)
-}
+// 	fmt.Println(data)
+// }
 
 
 
@@ -354,6 +373,8 @@ func main() {
 
 	tpl, _ = template.ParseGlob("./static/templates/*html")
 
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	
 	http.HandleFunc("/", Index)
 	http.HandleFunc("/AstroOGs", AstroOGs)
 	http.HandleFunc("/AstroApes", AstroApes)
