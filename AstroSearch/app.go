@@ -117,7 +117,7 @@ func AstroOGs(w http.ResponseWriter, r *http.Request) {
 		// Q := SearchTraits(Tlist, 0)
 		fmt.Println(Tlist)
 	}
-	// fmt.Println(NFT[0])
+
 
 	fmt.Println(SearchByID)
 
