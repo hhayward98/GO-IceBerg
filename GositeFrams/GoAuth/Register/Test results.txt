@@ -1,0 +1,21 @@
+test results for First iteration
+
+testing Inputs: RegisterUser("Bob", "Bob@outlook.com", "password", "password")
+
+
+=== RUN   TestRegisterUser
+2022/09/17 13:42:20 9
+--- PASS: TestRegisterUser (3.48s)
+=== RUN   TestInputHandler
+--- PASS: TestInputHandler (0.00s)
+=== RUN   TestQueryHandler1
+--- PASS: TestQueryHandler1 (0.00s)
+=== RUN   TestIPHRfail
+2022/09/17 13:42:20
+--- PASS: TestIPHRfail (0.00s)
+PASS
+ok      _/C_/Users/hunte/GO_programing/src/GositeFrams/GoAuth/Register  3.644s
+
+
+
+==================================================================================================

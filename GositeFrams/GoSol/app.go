@@ -5,14 +5,16 @@ import (
 	"log"
 	"net/http"
 	"context"
+	"html/template"
 
-	// "github.com/portto/solana-go-sdk/client"
-	// // "github.com/portto/solana-go-sdk/client/rpc"
-	// "github.com/portto/solana-go-sdk/types"
+	"github.com/portto/solana-go-sdk/client"
+	// "github.com/portto/solana-go-sdk/client/rpc"
+	"github.com/portto/solana-go-sdk/types"
 
 
 )
 
+var tpl *template.Template
 
 var C = client.NewClient(rpc.MainnetRPCEndpoint)
 
@@ -52,12 +54,16 @@ func WalletSearch(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Wallet balance in Lamport:", balance)
 	fmt.Println("Wallet balance in SOL:", balance/1e9)
-	tpl.ExecuteTemplate(w, "index.html", "null")
+	tpl.ExecuteTemplate(w, "index.html", "")
 
 }
 
 func main() {
 
+
+	tpl, _ = template.ParseGlob("./static/templates/*html")
+
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/", WalletSearch)
 
 	log.Print("Listening.....")
