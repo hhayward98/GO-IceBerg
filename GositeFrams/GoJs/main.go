@@ -18,11 +18,19 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func Page2(w http.ResponseWriter, r *http.Request) {
-	log.Print("Running Page2")
+func Imgrotate(w http.ResponseWriter, r *http.Request) {
+	log.Print("Running Image Rotate.....")
 
-	tpl.ExecuteTemplate(w, "Page2.html", "")
-	return
+	tpl.ExecuteTemplate(w, "ImgRotate.html", "")
+
+}
+
+func TempConv(w http.ResponseWriter, r *http.Request) {
+	log.Print("Running TempConv.....")
+
+	tpl.ExecuteTemplate(w, "TempConv.html", "")
+
+
 }
 
 func main() {
@@ -30,6 +38,8 @@ func main() {
 	tpl, _ = template.ParseGlob("./static/Templates/*html")
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/", Home)
+	http.HandleFunc("/ImageRotate", Imgrotate)
+	http.HandleFunc("/TempConvert", TempConv)
 
 	log.Print("Listening.....")
 
