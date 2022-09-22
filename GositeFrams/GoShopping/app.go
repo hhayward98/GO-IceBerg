@@ -17,8 +17,8 @@ import (
 var tpl *template.Template
 
 
-type CartItems struct {
 
+type CartItems struct {
 	ItemID string
 	Name string
 	Image string

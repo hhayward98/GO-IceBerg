@@ -238,6 +238,8 @@ a:hover {
 	padding: 0px 0px 0px 0px;
 }
 
+
+
 .post {
 	overflow: hidden;
 	background: #171515;
@@ -615,4 +617,11 @@ ul.style1 .first {
 	text-align: center;
 	text-decoration: none;
 
+}
+
+.RotateButton {
+	justify-content: center;
+	float: right;
+	background: #171515;
+	color: red;
 }

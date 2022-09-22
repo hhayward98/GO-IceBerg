@@ -11,3 +11,9 @@ label {
 #errorMessage {
    color: red;
 }
+
+.RotateButton {
+   float: right;
+   background: #171515;
+   color: red;
+}
