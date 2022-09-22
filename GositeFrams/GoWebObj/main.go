@@ -11,6 +11,9 @@ import (
 
 var tpl *template.Template
 
+
+
+
 func Home(w http.ResponseWriter, r *http.Request) {
 
 	log.Print("Running Home Page....")
@@ -27,7 +30,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 func Page2(w http.ResponseWriter, r *http.Request) {
 
 	log.Print("Running Page2....")
-	
+
 	WS := CreateTemplateStruct()
 
 	// var listPowers []string
@@ -41,9 +44,8 @@ func Page2(w http.ResponseWriter, r *http.Request) {
 // 	WS.B = append(SuperHero1)
 
 	var BatPowers = []string{"Batman","Money","Intelligence"}
-
 	WS.Body.Blist = append(BatPowers)
-// 	WS.B = append(SuperHero1)
+
 
 
 	tpl.ExecuteTemplate(w ,"Page2.html", WS)
