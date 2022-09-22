@@ -7,7 +7,15 @@ type Data struct {
 }
 
 
+func Test(data struct) {
 
+	
+
+	http.HandleFunc("/Test95", func(w http.ResponseWriter, r *http.Request) {
+
+		tpl.ExecuteTemplate(w "Test.html", data)
+	})
+}
 
 func AppRoutes() {
 
