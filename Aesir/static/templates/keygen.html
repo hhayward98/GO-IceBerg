@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>KeyGen</title>
+	<link rel="stylesheet" href="/static/css/GlobalTest.css">
+</head>
+<body>
+	<header>
+		<h1>sha256 Key Gen</h1>
+	</header>
+
+	<div>
+		<div id="Input">
+			<form method="POST">
+				<label>String to Encode</label><br />
+				<input type="text" name="uput"><br />
+				<input type="submit">
+			</form>
+		</div>
+		<div id="results">
+			<h2>Result:</h2>
+			<p>{{.}}</p>
+		</div>
+	</div>
+
+</body>
+</html>

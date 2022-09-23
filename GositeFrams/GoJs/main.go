@@ -35,7 +35,7 @@ func TempConv(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	tpl, _ = template.ParseGlob("./static/Templates/*html")
+	tpl, _ = template.ParseGlob("./static/templates/*html")
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/", Home)
 	http.HandleFunc("/ImageRotate", Imgrotate)

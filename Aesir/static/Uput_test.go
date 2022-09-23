@@ -21,11 +21,3 @@ func BenchmarkFunk1(b *testing.B){
 
 }
 
-func BenchmarkFunk2(b *testing.B){
-
-}
-
-func BenchmarkFunk3(b *testing.B){
-	
-}
-

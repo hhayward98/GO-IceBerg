@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"html/template"
+	"crypto/sha256"
+	"encoding/hex"
 	_ "github.com/go-sql-driver/mysql"
 
 )
@@ -25,11 +27,18 @@ type favthings struct {
 	T3 string
 }
 
+type KeyGen struct {
 
+}
 
-func Debugger(err error) {
+func Debugger(err error, Etype int) {
 	if err != nil {
-		log.Fatal(err)
+
+		if Etype == 0 {
+			log.Fatal(err)
+		}else if Etype == 1 {
+			log.Print(err)
+		}
 	}
 }
 
@@ -37,8 +46,8 @@ func Debugger(err error) {
 func Home(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Running Home Page\n")
 	
-	tmpl := template.Must(template.ParseFiles("static/templates/index.html"))
-	tmpl.Execute(w, "null")
+
+	tpl.ExecuteTemplate(w, "index.html", nil)
 	return
 
 }
@@ -46,14 +55,15 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 func Page3(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Running Page3\n")
-	tmpl := template.Must(template.ParseFiles("static/templates/page3.html")
+	
 	
 	obj1 := favthings{r.FormValue("F1"), r.FormValue("F2"), r.FormValue("F3")}
 	fmt.Println(obj1)
 	obj2 := InputForm{r.FormValue("Uname"), r.FormValue("Color"), obj1}
 	fmt.Println(obj2)
 
-	tmpl.Execute(w, obj2)
+
+	tpl.ExecuteTemplate(w, "page3.html", obj2)
 	log.Print("Running web-page")
 
 
@@ -63,14 +73,14 @@ func Page4(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("running Page4\n")
 
 	db, err := sql.Open("mysql", "Test:toor@(127.0.0.1:3308)/?parseTime=true")
-	Debugger(err)
+	Debugger(err,0)
 
 	if err := db.Ping(); err != nil {
 		log.Fatal(err)
 	}
 
 	_, err = db.Exec("USE aesir")
-	Debugger(err)
+	Debugger(err, 0)
 
 	log.Print("Connected to DB")
 
@@ -85,29 +95,50 @@ func Page2(w http.ResponseWriter, r *http.Request) {
 
 	tmpl := template.Must(template.ParseFiles("static/templates/Page2.html"))
 	tmpl.Execute(w, "null")
+	tpl.ExecuteTemplate(w, "Page2.html", nil)
 	return
+
+}
+
+
+func KGsha256(w http.ResponseWriter, r *http.Request) {
+
+	var resp string
+	Uput := r.FormValue("uput")
+	fmt.Println(Uput)
+	if len(Uput) > 0 {
+		Ecrpt := sha256.Sum256([]byte(Uput))
+		resp = hex.EncodeToString(Ecrpt[:])
+
+	}else {
+		resp = ""
+	}
+
+	tpl.ExecuteTemplate(w, "keygen.html" , resp)
 
 }
 
 
 func AppRoutes() {
 
-	//testing for docker container
-	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	// fs := http.FileServer(http.Dir("static"))
-	// http.Handle("/static/", http.StripPrefix("/static/", fs))
-	
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
 	http.HandleFunc("/", Home)
 	http.HandleFunc("/Page2", Page2)
 	http.HandleFunc("/Page3", Page3)
 	http.HandleFunc("/Page4", Page4)
+	http.HandleFunc("/KeyGen", KGsha256)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
 }
 
 
 func main() {
+
 	tpl, _ = template.ParseGlob("static/templates/*html")
+	
+
+
 
 	log.Print("Listening......")
 	AppRoutes()

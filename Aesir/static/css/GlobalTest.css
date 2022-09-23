@@ -11,7 +11,7 @@ header {
 }
 
 body {
-
+	justify-content: center;
 }
 
 head {
@@ -30,3 +30,4 @@ head {
 .F1 {
 
 }
+
