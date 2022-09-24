@@ -8,10 +8,8 @@ import (
 	"html/template"
 
 	"github.com/portto/solana-go-sdk/client"
-	// "github.com/portto/solana-go-sdk/client/rpc"
+	"github.com/portto/solana-go-sdk/rpc"
 	"github.com/portto/solana-go-sdk/types"
-
-
 )
 
 var tpl *template.Template

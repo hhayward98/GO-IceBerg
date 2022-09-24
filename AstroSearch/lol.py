@@ -9,40 +9,53 @@ class remLett:
 	def __getitem__(self,k):
 		return self.comp.get(k)
 
-DD = remLett()
+
+def main():
+
+	DD = remLett()
 
 
-t = ''
-with open('OG_Metadata.json', 'r') as f:
+	t = ''
+	with open('OG_Metadata.json', 'r') as f:
 
-	data = f.read()
-	t = t + data
+		data = f.read()
+		t = t + data
 
-	# print(data)
-pf = json.loads(t)
+		# print(data)
+	pf = json.loads(t)
 
-Fdict = {}
-AList =[]
-llist = []
-strbuffer = ''
-for i in range(len(pf)):
-
-	temp = pf[i]
-
-	tr = temp['metadata']
-	Name = tr['name']
-	atts = tr['attributes']
-	Numbers = Name.translate(DD)
-	strbuffer = strbuffer + str(Numbers + ",")
-	for i in atts:
-		for key, value in i.items():
-			strbuffer = strbuffer + str(value + ",")
-	AList.append(strbuffer)
+	Fdict = {}
+	AList =[]
+	llist = []
+	IMGlist = []
 	strbuffer = ''
+	for i in range(len(pf)):
+
+		temp = pf[i]
+
+		tr = temp['metadata']
+		Name = tr['name']
+		atts = tr['attributes']
+		IMG = tr['image']
+
+		Numbers = Name.translate(DD)
+		IMGtuple = (Numbers, IMG)
+		IMGlist.append(IMGtuple)
+
+		strbuffer = strbuffer + str(Numbers + ",")
+		for i in atts:
+			for key, value in i.items():
+				strbuffer = strbuffer + str(value + ",")
+		AList.append(strbuffer)
+		strbuffer = ''
 
 
-outfile = open('OGs.txt', 'w')
-for i in AList:
-	outfile.writelines(i + '\n')
+	outfile = open('OGsIMG.txt', 'w')
+	OneStr = ""
+	for i in IMGlist:
+		OneStr = str(i[0]) + ","+str(i[1])
+		outfile.writelines(OneStr + '\n')
 
 
+if __name__ == '__main__':
+	main()

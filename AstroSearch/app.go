@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"html/template"
 	"log"
+	"strconv"
 	// "time"
+	"reflect"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -106,9 +108,10 @@ func AstroOGs(w http.ResponseWriter, r *http.Request) {
 		    Hats: NFT[7],
 		    chains: NFT[8],
 		    BK: NFT[9],
-		    imgsrc: "",
+		    imgsrc: NFT[10],
 		}
 
+		
 		tpl.ExecuteTemplate(w, "OGs.html", FoundNFT)
 		return
 	} else {
@@ -226,8 +229,14 @@ func SearchID(NFT_Id string, collection int) []string {
 	    CTrait string
 	    Chains string
 	    bk string
+	  	temp int
+
 	)
 
+
+	// ================
+	// 		OGs
+	// ================
 	if collection == 0 {
 		query, err := db.Query(`SELECT * FROM OGs WHERE id = ?`, NFT_Id)
 		if err != nil {
@@ -241,9 +250,37 @@ func SearchID(NFT_Id string, collection int) []string {
 				log.Fatal(err)
 			}
 		}
-		NFT := []string{ID, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, Chains, bk}
+
+		fmt.Println(ID)
+		fmt.Println("Test")
+		Intval, err := strconv.Atoi(ID)
+		if err != nil {
+			log.Println(err)
+		}
+
+
+
+
+		var SRC string 
+		DBcheck, _ := db.Query(`SELECT id,imgSrc FROM OGIMG WHERE id = ?`, Intval)
+		defer DBcheck.Close()
+		for DBcheck.Next() {
+			err := DBcheck.Scan(&temp, &SRC)
+			if err != nil{
+				log.Fatal(err)
+			}
+		}
+
+		fmt.Println(SRC)
+
+
+		NFT := []string{ID, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, Chains, bk, SRC}
 		return NFT
 
+
+	// ================
+	// 		Apes
+	// ================
 	} else if collection == 1 {
 		query, err := db.Query(`SELECT * FROM Apes WHERE id = ?`, NFT_Id)
 		if err != nil {
@@ -260,6 +297,10 @@ func SearchID(NFT_Id string, collection int) []string {
 		NFT := []string{ID, Suit, skin, Visor, Eye, oneyes, Mouth, CTrait, Chains, bk}
 		return NFT
 
+
+	// ================
+	// 		Pups
+	// ================
 	} else if collection == 2 {
 
 		query, err := db.Query(`SELECT * FROM Pups WHERE id = ?`, NFT_Id)
