@@ -10,7 +10,7 @@ import (
 	"log"
 	"strconv"
 	// "time"
-	"reflect"
+	// "reflect"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -18,8 +18,26 @@ import (
 
 var tpl *template.Template
 
+
+
+
+type NFTList struct {
+	NFTs []struct
+}
+
+
+
+
+
+
+type NFTINFO struct {
+	NFTID string
+	imgSRC string
+	NFTatts SBI_NFT
+
+}
+
 type SBI_NFT struct {
-    NFT_id string 
     SS string
     Skin string
     Visors string
@@ -29,8 +47,15 @@ type SBI_NFT struct {
     Hats string
     chains string
     BK string
-    imgsrc string
 }
+
+
+
+
+
+
+
+
 
 type OGs struct {
     NFT_id string // could be int 
@@ -72,6 +97,10 @@ type Pups struct {
 }
 
 
+
+
+
+
 func AstroOGs(w http.ResponseWriter, r *http.Request) {
 
 	var NFT []string
@@ -98,7 +127,7 @@ func AstroOGs(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(Q)
 		NFT = Q
 		var FoundNFT = SBI_NFT{
-		    NFT_id: NFT[0], 
+
 		    SS: NFT[1],
 		    Skin: NFT[2],
 		    Visors: NFT[3],
@@ -108,11 +137,17 @@ func AstroOGs(w http.ResponseWriter, r *http.Request) {
 		    Hats: NFT[7],
 		    chains: NFT[8],
 		    BK: NFT[9],
-		    imgsrc: NFT[10],
+
+		}
+		var TestNFT = NFTINFO{
+			NFTID: NFT[0],
+			imgSRC: NFT[10],
+			NFTatts: FoundNFT,
 		}
 
+
 		
-		tpl.ExecuteTemplate(w, "OGs.html", FoundNFT)
+		tpl.ExecuteTemplate(w, "OGs.html", TestNFT)
 		return
 	} else {
 		SearchByID = false
