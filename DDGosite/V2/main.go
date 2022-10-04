@@ -190,78 +190,81 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// initiate HTML struct
 	Basic := HTMLDATASET()
 	fmt.Println(Basic.Header)
+	if r.Method == "POST" {
 
-	FormData := LoginDetails{
-		Username: r.FormValue("UserName"),
-		Password: r.FormValue("PassWord"),
-	}
-	_ = FormData
-
-	UNlower := strings.ToLower(FormData.Username)
-	//
-	if QueryHandler(UNlower) != true {
-		log.Print("invalid characters detected!!")
-		Basic.Body = "Illegal characters detected!!"
-		tpl.ExecuteTemplate(w, "login.html", Basic)
-		return
-	}
-
-	var (
-		UN string
-		PW string	
-	)
-
-	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
-	defer userCheck.Close()
-
-	for userCheck.Next() {
-		err := userCheck.Scan(&UN, &PW)
-		Debugger(err, 1)
-	}
-
-
-	if UN == UNlower {
-
-		if Match := CheckPasswordHash(FormData.Password, PW); Match == true{
-
-			seshToken := uuid.NewString()
-			expiresAt := time.Now().Add(120 * time.Second)
-
-
-			sessions[seshToken] = Session{
-				Authenticated: true,
-				username: UNlower,
-				expiry: expiresAt,
-			}
-
-
-			//set cookie
-			http.SetCookie(w, &http.Cookie{
-				Name: "Session_token",
-				Value: seshToken,
-				Expires: expiresAt,
-			})
-
-			tpl.ExecuteTemplate(w, "secretPage.html", Basic)
-			return
-
+		FormData := LoginDetails{
+			Username: r.FormValue("UserName"),
+			Password: r.FormValue("PassWord"),
 		}
+		_ = FormData
 
-		if len(FormData.Username) > 1 {
-			log.Print("Invalid password")
-			Basic.Body = "Invalid Username or Password"
+		UNlower := strings.ToLower(FormData.Username)
+		//
+		if QueryHandler(UNlower) != true {
+			log.Print("invalid characters detected!!")
+			Basic.Body = "Illegal characters detected!!"
 			tpl.ExecuteTemplate(w, "login.html", Basic)
 			return
 		}
 
-		tpl.ExecuteTemplate(w, "login.html", Basic)
-		return
-	} else if UN != UNlower {
+		var (
+			UN string
+			PW string	
+		)
 
-		log.Print("Invalid username")
-		Basic.Body = "Invalid Username or Password"
-		tpl.ExecuteTemplate(w, "login.html", Basic)
-		return
+		userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
+		defer userCheck.Close()
+
+		for userCheck.Next() {
+			err := userCheck.Scan(&UN, &PW)
+			Debugger(err, 1)
+		}
+
+
+		if UN == UNlower {
+
+			if Match := CheckPasswordHash(FormData.Password, PW); Match == true{
+
+				seshToken := uuid.NewString()
+				expiresAt := time.Now().Add(120 * time.Second)
+
+
+				sessions[seshToken] = Session{
+					Authenticated: true,
+					username: UNlower,
+					expiry: expiresAt,
+				}
+
+
+				//set cookie
+				http.SetCookie(w, &http.Cookie{
+					Name: "Session_token",
+					Value: seshToken,
+					Expires: expiresAt,
+				})
+
+				tpl.ExecuteTemplate(w, "secretPage.html", Basic)
+				return
+
+			}
+
+			if len(FormData.Username) > 1 {
+				log.Print("Invalid password")
+				Basic.Body = "Invalid Username or Password"
+				tpl.ExecuteTemplate(w, "login.html", Basic)
+				return
+			}
+
+			tpl.ExecuteTemplate(w, "login.html", Basic)
+			return
+		} else if UN != UNlower {
+
+			log.Print("Invalid username")
+			Basic.Body = "Invalid Username or Password"
+			tpl.ExecuteTemplate(w, "login.html", Basic)
+			return
+		}
+	
 	}
 
 	tpl.ExecuteTemplate(w, "login.html", Basic)
@@ -283,136 +286,138 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	// initiate HTML struct
 	Basic := HTMLDATASET()
 
-	FormData := RegisterDetails {
-		Email: r.FormValue("email"),
-		Username: r.FormValue("UserName"),
-		Password: r.FormValue("PassWord"),
-		ConfPass: r.FormValue("ConfPass"),
-	}
-	_ = FormData
+	if r.Method == "POST" {
 
-	UNlower := strings.ToLower(FormData.Username)
-	addy, BL := validateEmail(FormData.Email)
+		FormData := RegisterDetails {
+			Email: r.FormValue("email"),
+			Username: r.FormValue("UserName"),
+			Password: r.FormValue("PassWord"),
+			ConfPass: r.FormValue("ConfPass"),
+		}
+		_ = FormData
 
-	if BL == false {
-		log.Print("Email: " + addy +" is not valid!")
-		Basic.Body = "Email is not valid!"
-		tpl.ExecuteTemplate(w, "register.html", Basic)
-		return
-	}
+		UNlower := strings.ToLower(FormData.Username)
+		addy, BL := validateEmail(FormData.Email)
 
-	if QueryHandler(UNlower) != true {
-		log.Print("invalid characters detected!!")
-		Basic.Body = "Illegal characters detected!!"
-		tpl.ExecuteTemplate(w, "login.html", Basic)
-		return
-	}
+		if BL == false {
+			log.Print("Email: " + addy +" is not valid!")
+			Basic.Body = "Email is not valid!"
+			tpl.ExecuteTemplate(w, "register.html", Basic)
+			return
+		}
 
-	var (
-		UN string
-		PW string
-		EM string
-	)
+		if QueryHandler(UNlower) != true {
+			log.Print("invalid characters detected!!")
+			Basic.Body = "Illegal characters detected!!"
+			tpl.ExecuteTemplate(w, "login.html", Basic)
+			return
+		}
 
-
-	// Benchmark Query
-	userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
-	defer userCheck.Close()
-	for userCheck.Next() {
-		err := userCheck.Scan(&UN, &PW)
-		Debugger(err, 1)
-	}
-
-	EmailCheck, _ := db.Query(`SELECT email FROM users WHERE email = ?`, FormData.Email)
-	defer EmailCheck.Close()
-	for EmailCheck.Next() {
-		err := EmailCheck.Scan(&EM)
-		Debugger(err, 1)
-	}
-
-	if FormData.Username != ""{
-		if FormData.Password != ""{
-			if FormData.ConfPass == FormData.Password {
-				if FormData.Email != "" {
-
-					if UN == "" {
-
-						if EM == "" {
+		var (
+			UN string
+			PW string
+			EM string
+		)
 
 
-							HashPass, err := HashPassword(FormData.Password)
-							Debugger(err, 2)
+		// Benchmark Query
+		userCheck, _ := db.Query(`SELECT username, password FROM users WHERE username = ?`, UNlower)
+		defer userCheck.Close()
+		for userCheck.Next() {
+			err := userCheck.Scan(&UN, &PW)
+			Debugger(err, 1)
+		}
 
-							result, err := db.Exec(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`, UNlower, HashPass, FormData.Email)
-							Debugger(err, 1)
+		EmailCheck, _ := db.Query(`SELECT email FROM users WHERE email = ?`, FormData.Email)
+		defer EmailCheck.Close()
+		for EmailCheck.Next() {
+			err := EmailCheck.Scan(&EM)
+			Debugger(err, 1)
+		}
 
-							id, err := result.LastInsertId()
-							log.Print(id)
+		if FormData.Username != ""{
+			if FormData.Password != ""{
+				if FormData.ConfPass == FormData.Password {
+					if FormData.Email != "" {
 
-							seshToken := uuid.NewString()
-							expiresAt := time.Now().Add(120 * time.Second)
+						if UN == "" {
+
+							if EM == "" {
 
 
-							sessions[seshToken] = Session{
-								Authenticated: true,
-								username: UNlower,
-								expiry: expiresAt,
+								HashPass, err := HashPassword(FormData.Password)
+								Debugger(err, 2)
+
+								result, err := db.Exec(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`, UNlower, HashPass, FormData.Email)
+								Debugger(err, 1)
+
+								id, err := result.LastInsertId()
+								log.Print(id)
+
+								seshToken := uuid.NewString()
+								expiresAt := time.Now().Add(120 * time.Second)
+
+
+								sessions[seshToken] = Session{
+									Authenticated: true,
+									username: UNlower,
+									expiry: expiresAt,
+								}
+
+
+								//set cookie
+								http.SetCookie(w, &http.Cookie{
+									Name: "Session_token",
+									Value: seshToken,
+									Expires: expiresAt,
+								})
+
+								tpl.ExecuteTemplate(w, "secretPage.html", Basic)
+								return
+
+							}else if EM != ""{
+								log.Print("Email not available")
+								Basic.Body = "Email is Not available!"
+								tpl.ExecuteTemplate(w, "register.html", Basic)
+								return
 							}
-
-
-							//set cookie
-							http.SetCookie(w, &http.Cookie{
-								Name: "Session_token",
-								Value: seshToken,
-								Expires: expiresAt,
-							})
-
-							tpl.ExecuteTemplate(w, "secretPage.html", Basic)
-							return
-
-						}else if EM != ""{
-							log.Print("Email not available")
-							Basic.Body = "Email is Not available!"
+						}else if UN != "" {
+							log.Print("Username is not available")
+							Basic.Body = "Username is Not available!"
 							tpl.ExecuteTemplate(w, "register.html", Basic)
 							return
 						}
-					}else if UN != "" {
-						log.Print("Username is not available")
-						Basic.Body = "Username is Not available!"
+
+					}else if FormData.Email == ""{
+						log.Print("Email is empty")
+						Basic.Body = "Email can not be empty!"
 						tpl.ExecuteTemplate(w, "register.html", Basic)
 						return
 					}
-
-				}else if FormData.Email == ""{
-					log.Print("Email is empty")
-					Basic.Body = "Email can not be empty!"
+				}else{
+					log.Print("Passwords do not match!")
+					Basic.Body = "Passwords do not match!"
 					tpl.ExecuteTemplate(w, "register.html", Basic)
 					return
 				}
-			}else{
-				log.Print("Passwords do not match!")
-				Basic.Body = "Passwords do not match!"
+
+			}else if FormData.Password == "" {
+				log.Print("Password is Empty")
+				Basic.Body = "Password can not be empty"
 				tpl.ExecuteTemplate(w, "register.html", Basic)
 				return
 			}
-
-		}else if FormData.Password == "" {
-			log.Print("Password is Empty")
-			Basic.Body = "Password can not be empty"
+		}else if FormData.Username == "" {
+			if len(FormData.Email) > 1 {
+				log.Print("Username is Empty")
+				Basic.Body = "Username Can not be empty!"
+				tpl.ExecuteTemplate(w, "register.html", Basic)
+				return
+			}
 			tpl.ExecuteTemplate(w, "register.html", Basic)
 			return
 		}
-	}else if FormData.Username == "" {
-		if len(FormData.Email) > 1 {
-			log.Print("Username is Empty")
-			Basic.Body = "Username Can not be empty!"
-			tpl.ExecuteTemplate(w, "register.html", Basic)
-			return
-		}
-		tpl.ExecuteTemplate(w, "register.html", Basic)
-		return
 	}
-
 	tpl.ExecuteTemplate(w, "register.html", Basic)
 	return
 	

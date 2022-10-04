@@ -14,13 +14,15 @@ services:
     container_name: ddlabs-db
     command:
       - --default-authentication-plugin=mysql_native_password
-  app:
+  app1:
     build:
       context: .
     volumes:
       - .:/go/src/app:rw
+    restart: always
     ports:
       - "8080:8088"
     container_name: dd-goapp
     
+  app2:
 
