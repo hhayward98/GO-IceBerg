@@ -36,7 +36,7 @@ var store = sessions.NewCookieStore([]byte("super-secret"))
 
 func init() {
 	store.Options.HttpOnly = true // prevents javascript from interacting with cookie
-	store.Options.Secure = true // for https 
+	store.Options.Secure = false // for https 
 	gob.Register(&User{})
 }
 
@@ -48,7 +48,7 @@ func auth(c *gin.Context) {
 	fmt.Println("session:", session)
 	_, ok := session.Values["user"]
 	if !ok {
-		c.HTML(http.StatusForbidden, "logion.html", nil)
+		c.HTML(http.StatusForbidden, "login.html", nil)
 		c.Abort()
 		return
 	}
@@ -84,12 +84,17 @@ func LoginPost(c *gin.Context) {
 	err = bcrypt.CompareHashAndPassword([]byte(user.HashPass), []byte(password))
 	fmt.Println("Error from bycrypt:", err)
 	if err == nil {
+
+
 		session, _ := store.Get(c.Requet, "session")
 
 		session.Values["user"] = user
 
 		session.Save(c.Request, c.Writer)
+
 		c.HTML(http.StatusOk, "loggedin.html", gin.H{"username": user.Username})
+		
+
 		return
 	}
 	c.HTML(http.StatusUnauthorized, "login.html", gin.H{"message": "check Username Or Password"})
