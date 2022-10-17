@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-	// "fmt"
+	"fmt"
 	"log"
 	// "time"
 	// "golang.org/x/crypto/bcrypt"
@@ -25,10 +25,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_, err = db.Exec("USE asearch")
+	_, err = db.Exec("USE pytest")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("Connected to Database")
 
 
 	// user table 
