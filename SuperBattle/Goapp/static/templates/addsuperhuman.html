@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>AddSuper</title>
+	<link href="/static/css/global.css" rel="stylesheet" type="text/css" media="screen" />
+	<script src="js/app.py"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" 
+   rel="stylesheet" crossorigin="anonymous"
+   integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3">
+</head>
+<body>
+	<nav class="site-header sticky-top py-1 ">
+		<div class="container d-flex flex-column flex-md-row justify-content-between ">
+			<a class="py-2 d-none d-md-inline-block" herf="{{.DomainName}}/">Home</a>
+			<a class="py-2 d-none d-md-inline-block" href="{{.DomainName}}/AddSuper" id="AddSuperHuman">AddSuper</a>
+			<a class="py-2 d-none d-md-inline-block" href="{{.DomainName}}/SuperBattle" id="">Battle</a>
+			<a class="py-2 d-none d-md-inline-block" href="{{.DomainName}}/ShowHeros" id="">SuperHeros</a>
+			<a class="py-2 d-none d-md-inline-block" href="{{.DomainName}}/ShowVillains" id="">SuperVillains</a>
+		</div>
+	</nav>
+
+
+	<div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
+		<div class="col-md-5 p-lg-5 mx-auto my-5">
+			<h1 class="display-4 font-weight-normal">Add Super Human</h1>
+			<form method="POST" action="">
+				<br>
+				<br>
+				<label style="font-size: 1.5rem;">Choose a side</label><br />
+				<span>
+					<label>Hero</label>
+					<input type="radio" name="allegiance" value="Hero">
+					<br>
+					<label>Villain</label>
+					<input type="radio" name="allegiance" value="Villain">
+				</span>
+				<br>
+				<br>
+				<label style="font-size: 2rem;">Super Human Name</label><br />
+				<input type="text" name="SHN" id="SHN"><br />
+				<br>
+
+				<label style="font-size: 2rem;">Passive SuperPower </label><br />
+				<p>Ex: flying, super-speed, etc</p>
+				<input type="text" name="Pasv" id="PassivePower"><br />
+				<br>
+				<label style="font-size: 2rem;">Primary Attack Power </label><br />
+				<p>Ex: fireball, laserEyes</p>
+				
+				<input type="text" name="Attk" id="AttackPower"><br />
+				<br>
+				<input type="submit" name="submit" value="submit" class="btn btn-outline-secondary">
+			</form>
+
+			<h3 class="text-primary">{{.Body}}</h3>
+		</div>
+
+			
+	</div>
+
+
+</body>
+</html>

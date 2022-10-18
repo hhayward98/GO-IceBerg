@@ -51,6 +51,8 @@ type Cookie struct {
 }
 
 
+
+
 var tpl *template.Template
 
 func Home(w http.ResponseWriter, r *http.Request) {

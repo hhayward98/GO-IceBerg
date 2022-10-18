@@ -25,13 +25,30 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_, err = db.Exec("USE pytest")
+	_, err = db.Exec("USE superhumans")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("Connected to Database")
 
+	Namelower := "bob"
+
+	var SelcetedHero string
+
+	HeroCheck, _ := db.Query(`SELECT heroname FROM heros WHERE heroname = ?`, Namelower)
+	
+	log.Println(HeroCheck)
+
+	for HeroCheck.Next() {
+		err := HeroCheck.Scan(&SelcetedHero)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	HeroCheck.Close()
+	log.Println(SelcetedHero)
 
 	// user table 
 	// {
