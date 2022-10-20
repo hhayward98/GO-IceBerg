@@ -33,38 +33,29 @@
 	<div class=" postition-relative d-md-flex flex-md-equal w-100 my-md-3 pl-md-3">
       <div class="bg-light mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
         <div class="my-3 py-3">
-          <h2 class="display-5">Select Hero</h2>
-          <div class="dropdown">
-          	<button id="Hdropbtn">Hero</button>
-          	<div id="">
-          		{{ $hlist := .Body.HeroList }}
-          		{{ range $hlist }}
-          			
-          			<p>{{.Name}}</p>
-          		{{ end }}
-          	</div>
-
-          </div>
-
-          
+        	<p>Select Hero
+						<select id="heroSelect">
+	        		{{ $hlist := .Body.HeroList }}
+	        		{{ range $hlist }}
+	        			
+	        			<option>{{.Name}}</option>
+	        		{{ end }}
+						</select>
+					</p>
+         
         </div>
         <div class="bg-light box-shadow mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
       </div>
       <div class="bg-dark mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden">
         <div class="my-3 p-3">
-          <h2 class="display-5">Select Villain</h2>
-          <div class="dropdown">
-          	<button id="Hdropbtn">Villain</button>
-          	<div id="">
+					<p>Select a villain:
+						<select id="villainSelect">
           		{{ $vlist := .Body.VillainList }}
           		{{ range $vlist }}
-          			
-          			<p>{{.Name}}</p>
+          			<option>{{.Name}}</option>
           		{{ end }}
-          	</div>
-
-          </div>
-          
+						</select>
+					</p>
         </div>
         <div class="bg-dark box-shadow mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
       </div>
