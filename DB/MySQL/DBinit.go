@@ -14,6 +14,13 @@ import (
 // 	return string(bytes), err
 // }
 
+type SuperHuman struct {
+	Name string
+	PassiveP string
+	AttackP string
+}
+
+
 func main() {
 
 	//connect to database
@@ -32,23 +39,41 @@ func main() {
 
 	fmt.Println("Connected to Database")
 
-	Namelower := "bob"
 
-	var SelcetedHero string
 
-	HeroCheck, _ := db.Query(`SELECT heroname FROM heros WHERE heroname = ?`, Namelower)
-	
-	log.Println(HeroCheck)
+	superheros := make([]*SuperHuman,0)
 
-	for HeroCheck.Next() {
-		err := HeroCheck.Scan(&SelcetedHero)
-		if err != nil {
-			log.Fatal(err)
-		}
+	heroRows, err := db.Query(`SELECT heroname, passivepower, attackpower FROM heros`)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	HeroCheck.Close()
-	log.Println(SelcetedHero)
+	for heroRows.Next() {
+		Hero := new(SuperHuman)
+		if err := heroRows.Scan(&Hero.Name, &Hero.PassiveP, &Hero.AttackP); err != nil {
+			panic(err)
+		}
+
+		superheros = append(superheros, Hero)
+
+	}
+
+
+	if err := heroRows.Err(); err != nil {
+		panic(err)
+	}
+	heroRows.Close()
+
+
+	
+	log.Println(superheros)
+	for i, s := range superheros {
+		fmt.Println(i,s)
+		Name := s.Name
+		fmt.Println(Name)
+	}
+
+
 
 	// user table 
 	// {

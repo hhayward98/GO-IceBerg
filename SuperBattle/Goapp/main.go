@@ -23,7 +23,6 @@ type HTMLDATA struct {
 
 type SuperHuman struct {
 	Name string
-	Allegiance string
 	PassiveP string
 	AttackP string
 }
@@ -69,7 +68,7 @@ func InjectionHandler(Uput string) bool {
 
 }
 
-func RequestFromDatabase(Allegiance string) string{
+func RequestFromDatabase(Allegiance string) []*SuperHuman{
 
 	// db, err := sql.Open("mysql", "test:toor@tcp(db:3306)/superhumans")
 	// Debugger(err, 1)
@@ -96,32 +95,58 @@ func RequestFromDatabase(Allegiance string) string{
 
 	if Allegiance == "Hero" {
 
+		superheros := make([]*SuperHuman,0)
+
+		heroRows, err := db.Query(`SELECT heroname, passivepower, attackpower FROM heros`)
+		Debugger(err, 0)
+
+		for heroRows.Next() {
+			Hero := new(SuperHuman)
+			if err := heroRows.Scan(&Hero.Name, &Hero.PassiveP, &Hero.AttackP); err != nil {
+				Debugger(err, 0)
+			}
+
+			superheros = append(superheros, Hero)
+		}
+
+		if err := heroRows.Err(); err != nil {
+			Debugger(err, 0)
+		}
+		heroRows.Close()
 
 
-		HeroCheck, _ := db.Query(`SELECT * FROM heros`)
+		//superheros is an array of SuperHumans from the heros table
+		return superheros
 
 
-		// for the number of heros in table heros
-		// create a SuperHuman object using hero data from database
-		// append SuperHuman object to array of Heros
-		HeroCheck.Close()
-
-		// return array of Heros
-		return "Temp string Test Hero"
 	} else if Allegiance == "Villain" {
 
+		supervillains := make([]*SuperHuman,0)
 
-		VillainCheck, _ := db.Query(`SELECT * FROM villains`)
+		VillainRows, _ := db.Query(`SELECT villainname, passivepower, attackpower, FROM villains`)
+		Debugger(err, 0)
 
-		// for the number of villains in table villains:
-		// Create a SuperHuman object using villain data from database
-		// append SuperHuman object to array of Heros
-		VillainCheck.Close()
+		for VillainRows.Next() {
+			Villain := new(SuperHuman)
+			
+			if err := VillainRows.Scan(&Villain.Name, &Villain.PassiveP, &Villain.AttackP); err != nil {
+				Debugger(err, 0)
+			}
+			
+			supervillains = append(supervillains, Villain)
 
-		// return array of Villains
-		return "Temp string Test Villain"
+		}
+
+		if err := VillainRows.Err(); err != nil {
+			Debugger(err, 0)
+		}
+
+		VillainRows.Close()
+
+		return supervillains
+
 	}
-	return "Null"
+	return nil
 }
 
 
@@ -307,6 +332,7 @@ func ShowHero(w http.ResponseWriter, r *http.Request) {
 
 
 	ArrayHeros := RequestFromDatabase("Hero")
+
 	log.Println(ArrayHeros)
 
 	htlmData := SetHTMLData()
