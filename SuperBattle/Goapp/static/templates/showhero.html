@@ -30,6 +30,44 @@
 		</div>
 	</div>
 
+	<div class="container-fluid">
+		<div style="border-bottom: 2px solid black;" class="row">
+			<div class="col"> 
+				<p>Name:</p>
+				<p>Powers: </p>
+			</div>
+			<div class="col"> 
+				<p>Name:</p>
+				<p>Powers: </p>
+			</div>
+			<div class="col"> 
+				<p>Name:</p>
+				<p>Powers: </p>
+			</div>
+			<div class="col"> 
+				<p>Name:</p>
+				<p>Powers: </p>
+			</div>
+			<div class="col"> 
+				<p>Name:</p>
+				<p>Powers: </p>
+			</div>
+		</div>
+		<div style="border-bottom: 2px solid black;" class="row">
+		{{ $hlist := .Body.HeroList}}
+		{{ range $hlist }}
+			<div class="col">
+				<p>Hero Name: {{.Name}}</p>
+				<p>Super Powers: {{.PassiveP}} and {{.AttackP}}</p>
+			</div>
+		{{ end }}
+		</div>
+
+	</div>
+
+	<h1>{{.Body.HeroList}}</h1>
+
+
 
 </body>
 </html>
