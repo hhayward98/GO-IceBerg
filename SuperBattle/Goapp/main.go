@@ -16,7 +16,7 @@ var tpl *template.Template
 
 type HTMLDATA struct {
 	DomainName string
-	message string
+	Message string
 	Body BODY
 	footerContent string
 }
@@ -44,7 +44,7 @@ func SetHTMLData() HTMLDATA{
 
 	Hdata := HTMLDATA{
 		DomainName: "http://localhost:8080",
-		message: "",
+		Message: " ",
 		Body: bodyData,
 		footerContent: "Created by <a href='https://demonic-labs.com'>Demonic Labs</a>",
 	}
@@ -241,42 +241,42 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 
 		if len(SuperhumanName) < 1 {
 			log.Println("Empty Field")
-			htlmData.message = "Name can not be Empty!"
+			htlmData.Message = "Name can not be Empty!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
 		}
 
 		if len(PassivePower) < 1 {
 			log.Println("Empty Field")
-			htlmData.message = "Passive Power can not be Empty!"
+			htlmData.Message = "Passive Power can not be Empty!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
 		}
 
 		if len(AttackPower) < 1 {
 			log.Println("Empty Field")
-			htlmData.message = "Attack Power can not be Empty!"
+			htlmData.Message = "Attack Power can not be Empty!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
 		}
 
 		if InjectionHandler(SuperhumanName) != true {
 			log.Print("invalid characters detected!!")
-			htlmData.message = "Illegal characters detected!!"
+			htlmData.Message = "Illegal characters detected!!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
 		}
 
 		if InjectionHandler(PassivePower) != true {
 			log.Print("invalid characters detected!!")
-			htlmData.message = "Illegal characters detected!!"
+			htlmData.Message = "Illegal characters detected!!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
 		}
 
 		if InjectionHandler(AttackPower) != true {
 			log.Print("invalid characters detected!!")
-			htlmData.message = "Illegal characters detected!!"
+			htlmData.Message = "Illegal characters detected!!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
 		}
@@ -301,7 +301,7 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 			if len(SelcetedHero) > 0 {
 				log.Println("SuperHero Name not available")
 
-				htlmData.message = "SuperHero Name not available"
+				htlmData.Message = "SuperHero Name not available"
 
 				tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 				return
@@ -312,7 +312,7 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 				result, err := db.Exec(`INSERT INTO heros (heroname, passivepower, attackpower) VALUES (?,?,?)`, Namelower, PassivePower, AttackPower)
 				Debugger(err,0)
 				log.Println("Insert successful: ",result)
-				htlmData.message = "Successfully added superHuman!"
+				htlmData.Message = "Successfully added superHuman!"
 
 				tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 				return
@@ -333,7 +333,7 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 
 			if len(SelectedVillain) > 0 {
 
-				htlmData.message = "Super Villain name is not available"
+				htlmData.Message = "Super Villain name is not available"
 
 				tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 				return
@@ -343,7 +343,7 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 				result, err := db.Exec(`INSERT INTO villains (villainname, passivepower, attackpower) VALUES (?,?,?)`, Namelower, PassivePower, AttackPower)
 				Debugger(err, 0)
 				log.Println("Successfully added SuperVillain to Database", result)
-				htlmData.message = "Successfully Uploaded SuperVillain!"
+				htlmData.Message = "Successfully Uploaded SuperVillain!"
 
 				tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 				return
@@ -353,7 +353,7 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 		} else {
 
 			log.Println("ELSE: ******************************************************")
-			htlmData.message = "Make Sure all fields and options and not empty"
+			htlmData.Message = "Make Sure all fields and options and not empty"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 
 		}
