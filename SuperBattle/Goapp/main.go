@@ -240,21 +240,21 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 		// sanitize user input
 
 		if len(SuperhumanName) < 1 {
-			
+			log.Println("Empty Field")
 			htlmData.message = "Name can not be Empty!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
 		}
 
 		if len(PassivePower) < 1 {
-			
+			log.Println("Empty Field")
 			htlmData.message = "Passive Power can not be Empty!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
 		}
 
 		if len(AttackPower) < 1 {
-			
+			log.Println("Empty Field")
 			htlmData.message = "Attack Power can not be Empty!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
