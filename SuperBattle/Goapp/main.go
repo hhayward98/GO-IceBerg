@@ -140,10 +140,6 @@ func RequestFromDatabase(Allegiance string) []*SuperHuman{
 		}
 		heroRows.Close()
 
-
-
-
-
 		//superheros is an array of SuperHumans from the heros table
 		return superheros
 
@@ -152,7 +148,7 @@ func RequestFromDatabase(Allegiance string) []*SuperHuman{
 
 		supervillains := make([]*SuperHuman,0)
 
-		VillainRows, _ := db.Query(`SELECT villainname, passivepower, attackpower, FROM villains`)
+		VillainRows, _ := db.Query(`SELECT villainname, passivepower, attackpower FROM villains`)
 		Debugger(err, 0)
 
 		for VillainRows.Next() {
@@ -370,13 +366,13 @@ func ShowVillains(w http.ResponseWriter, r *http.Request) {
 	log.Println("Running ShowVillains page....")
 
 
-	// ArryVillains := RequestFromDatabase("Villain")
+	ArryVillains := RequestFromDatabase("Villain")
 	
-	// log.Println(ArryVillains)
+	log.Println(ArryVillains)
 
 	htlmData := SetHTMLData()
 
-	// htlmData.Body.VillainList = ArryVillains
+	htlmData.Body.VillainList = ArryVillains
 
 	tpl.ExecuteTemplate(w, "showvillain.html", htlmData)
 	return

@@ -41,33 +41,35 @@ func main() {
 
 
 
-	superheros := make([]*SuperHuman,0)
+	supervillains := make([]*SuperHuman,0)
 
-	heroRows, err := db.Query(`SELECT heroname, passivepower, attackpower FROM heros`)
+	VillainRows, _ := db.Query(`SELECT villainname, passivepower, attackpower FROM villains`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for heroRows.Next() {
-		Hero := new(SuperHuman)
-		if err := heroRows.Scan(&Hero.Name, &Hero.PassiveP, &Hero.AttackP); err != nil {
+	for VillainRows.Next() {
+		Villain := new(SuperHuman)
+		
+		if err := VillainRows.Scan(&Villain.Name, &Villain.PassiveP, &Villain.AttackP); err != nil {
 			panic(err)
 		}
-
-		superheros = append(superheros, Hero)
+		
+		supervillains = append(supervillains, Villain)
 
 	}
 
-
-	if err := heroRows.Err(); err != nil {
+	if err := VillainRows.Err(); err != nil {
 		panic(err)
 	}
-	heroRows.Close()
+
+	VillainRows.Close()
 
 
-	
-	log.Println(superheros)
-	for i, s := range superheros {
+
+
+	log.Println(supervillains)
+	for i, s := range supervillains {
 		fmt.Println(i,s)
 		Name := s.Name
 		fmt.Println(Name)

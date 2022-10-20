@@ -53,7 +53,16 @@
 				<p>Powers: </p>
 			</div>
 		</div>
-
+		<div style="border-bottom: 2px solid black;" class="row">
+		{{ $vlist := .Body.VillainList}}
+		{{ $count := 5 }}
+		{{ range $vlist }}
+			<div class="col">
+				<p>Villain Name: {{.Name}}</p>
+				<p>Super Powers: {{.PassiveP}} and {{.AttackP}}</p>
+			</div>
+		{{ end }}
+		</div>
 
 	</div>
 
