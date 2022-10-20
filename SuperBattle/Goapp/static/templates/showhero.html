@@ -30,31 +30,12 @@
 		</div>
 	</div>
 
+
 	<div class="container-fluid">
-		<div style="border-bottom: 2px solid black;" class="row">
-			<div class="col"> 
-				<p>Name:</p>
-				<p>Powers: </p>
-			</div>
-			<div class="col"> 
-				<p>Name:</p>
-				<p>Powers: </p>
-			</div>
-			<div class="col"> 
-				<p>Name:</p>
-				<p>Powers: </p>
-			</div>
-			<div class="col"> 
-				<p>Name:</p>
-				<p>Powers: </p>
-			</div>
-			<div class="col"> 
-				<p>Name:</p>
-				<p>Powers: </p>
-			</div>
-		</div>
+
 		<div style="border-bottom: 2px solid black;" class="row">
 		{{ $hlist := .Body.HeroList}}
+
 		{{ range $hlist }}
 			<div class="col">
 				<p>Hero Name: {{.Name}}</p>
@@ -63,9 +44,25 @@
 		{{ end }}
 		</div>
 
+
 	</div>
 
-	<h1>{{.Body.HeroList}}</h1>
+
+	<div id="Card justify-content-between" >
+		{{ range $hlist }}
+
+			<div class="SuperHuman">
+				<div class="Names"> 
+					<h3>{{.Name}}</h3>
+				</div>
+				<div class="Powers">
+					<P class="font-weight-bold">Super Powers</p>
+					<p>{{.PassiveP}}</p>
+					<p>{{.AttackP}}</p>
+				</div>
+			</div>
+		{{ end }}
+	</div>
 
 
 

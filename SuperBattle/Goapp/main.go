@@ -16,12 +16,12 @@ var tpl *template.Template
 
 type HTMLDATA struct {
 	DomainName string
+	message string
 	Body BODY
 	footerContent string
 }
 
 type BODY struct{
-	message string
 	HeroList []*SuperHuman
 	VillainList []*SuperHuman
 }
@@ -38,13 +38,13 @@ func SetHTMLData() HTMLDATA{
 
 
 	bodyData := BODY{
-		message: " ",
 		HeroList: make([]*SuperHuman,0),
 		VillainList: make([]*SuperHuman,0),
 	}
 
 	Hdata := HTMLDATA{
 		DomainName: "http://localhost:8080",
+		message: "",
 		Body: bodyData,
 		footerContent: "Created by <a href='https://demonic-labs.com'>Demonic Labs</a>",
 	}
@@ -239,24 +239,44 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 
 		// sanitize user input
 
+		if len(SuperhumanName) < 1 {
+			
+			htlmData.message = "Name can not be Empty!"
+			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
+			return
+		}
+
+		if len(PassivePower) < 1 {
+			
+			htlmData.message = "Passive Power can not be Empty!"
+			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
+			return
+		}
+
+		if len(AttackPower) < 1 {
+			
+			htlmData.message = "Attack Power can not be Empty!"
+			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
+			return
+		}
 
 		if InjectionHandler(SuperhumanName) != true {
 			log.Print("invalid characters detected!!")
-			htlmData.Body.message = "Illegal characters detected!!"
+			htlmData.message = "Illegal characters detected!!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
 		}
 
 		if InjectionHandler(PassivePower) != true {
 			log.Print("invalid characters detected!!")
-			htlmData.Body.message = "Illegal characters detected!!"
+			htlmData.message = "Illegal characters detected!!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
 		}
 
 		if InjectionHandler(AttackPower) != true {
 			log.Print("invalid characters detected!!")
-			htlmData.Body.message = "Illegal characters detected!!"
+			htlmData.message = "Illegal characters detected!!"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 			return
 		}
@@ -265,6 +285,8 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 
 
 		if Allegiance == "Hero" {
+
+
 			var SelcetedHero string
 			HeroCheck, _ := db.Query(`SELECT heroname FROM heros WHERE heroname = ?`, Namelower)
 
@@ -279,7 +301,7 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 			if len(SelcetedHero) > 0 {
 				log.Println("SuperHero Name not available")
 
-				htlmData.Body.message = "SuperHero Name not available"
+				htlmData.message = "SuperHero Name not available"
 
 				tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 				return
@@ -290,7 +312,7 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 				result, err := db.Exec(`INSERT INTO heros (heroname, passivepower, attackpower) VALUES (?,?,?)`, Namelower, PassivePower, AttackPower)
 				Debugger(err,0)
 				log.Println("Insert successful: ",result)
-				htlmData.Body.message = "Successfully added superHuman!"
+				htlmData.message = "Successfully added superHuman!"
 
 				tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 				return
@@ -311,7 +333,7 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 
 			if len(SelectedVillain) > 0 {
 
-				htlmData.Body.message = "Super Villain name is not available"
+				htlmData.message = "Super Villain name is not available"
 
 				tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 				return
@@ -321,7 +343,7 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 				result, err := db.Exec(`INSERT INTO villains (villainname, passivepower, attackpower) VALUES (?,?,?)`, Namelower, PassivePower, AttackPower)
 				Debugger(err, 0)
 				log.Println("Successfully added SuperVillain to Database", result)
-				htlmData.Body.message = "Successfully Uploaded SuperVillain!"
+				htlmData.message = "Successfully Uploaded SuperVillain!"
 
 				tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 				return
@@ -331,7 +353,7 @@ func AddSuperHuman(w http.ResponseWriter, r *http.Request) {
 		} else {
 
 			log.Println("ELSE: ******************************************************")
-			htlmData.Body.message = "Make Sure all fields and options and not empty"
+			htlmData.message = "Make Sure all fields and options and not empty"
 			tpl.ExecuteTemplate(w, "addsuperhuman.html", htlmData)
 
 		}
@@ -383,10 +405,17 @@ func ShowVillains(w http.ResponseWriter, r *http.Request) {
 func Battle(w http.ResponseWriter, r *http.Request) {
 	log.Println("Running Battle Page....")
 
-	htlmData := SetHTMLData()
 
+	ArryVillains := RequestFromDatabase("Villain")
+	ArrayHeros := RequestFromDatabase("Hero")
+
+	htlmData := SetHTMLData()
+	htlmData.Body.VillainList = ArryVillains
+	htlmData.Body.HeroList = ArrayHeros
 
 	tpl.ExecuteTemplate(w, "battle.html", htlmData)
+
+	return
 
 }
 
