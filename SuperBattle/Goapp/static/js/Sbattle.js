@@ -30,7 +30,7 @@ function StartFight() {
 		Winner.innerHTML = "<p> " + selectedHeroValue + " Defeted " + selectedVillainValue + "</p><br />";
 	} else {
 		console.log("Tie");
-		Winner.innerHTML = "<p> Its a Tie </p><br /> <p> Both " + selectedHeroValue + " and " + selectedVillainValue +"retreat to safty </p>";
+		Winner.innerHTML = "<p> Its a Tie </p><br /> <p> Both " + selectedHeroValue + " and " + selectedVillainValue +" retreat to safty </p>";
 	}
 	console.log(selectedVillainValue);
 	console.log(selectedHeroValue);
