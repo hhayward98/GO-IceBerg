@@ -108,3 +108,12 @@ func main() {
 	// 	fmt.Println(id)
 	// }
 }
+
+
+// // mysql> CREATE TABLE volunteers(
+//     -> id INT AUTO_INCREMENT,
+//     -> first_name TEXT NOT NULL,
+//     -> last_name TEXT NOT NULL,
+//     -> email_address TEXT NOT NULL,
+//     -> phone_number VARCHAR(12),
+//     -> PRIMARY KEY (id));

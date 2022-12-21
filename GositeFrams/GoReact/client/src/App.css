@@ -1,0 +1,41 @@
+body {
+  background-color: #252525;
+}
+
+h1 {
+  color: limegreen;
+
+}
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+
+.App-header {
+  padding: 20px 0px 20px 0px;
+  background-color: #101010;
+  border-bottom: 3px solid limegreen;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+
+#NavBarDiv {
+
+  width: 900px;
+  border: 2px solid limegreen;
+  padding: 10px 10px 0px 10px;
+
+}
