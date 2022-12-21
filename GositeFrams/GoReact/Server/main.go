@@ -34,15 +34,17 @@ func AppRoutes() {
 
 	mux := http.NewServeMux()
 
+	C := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:3000"},
+		AllowedMethods: []string{http.MethodPost,http.MethodGet},
+		Debug: true,
+	})
+
+
 	mux.HandleFunc("/RouteOne", Route1)
 
-	// c := cors.New(cors.Options{
-	// 	AllowedOrigins: []string{"http://localhost:8080"},
-	// 	AllowedCredentials: true,
-	// 	Debug: true,
-	// })
 
-	handler := cors.Default().Handler(mux)
+	handler := C.Handler(mux)
 
 	log.Fatal(http.ListenAndServe(":8080", handler))
 
