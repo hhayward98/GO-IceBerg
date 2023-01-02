@@ -58,6 +58,7 @@ func Route3(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 
+	log.Println("\nRequest \n", r)
 
 
 }
@@ -68,6 +69,11 @@ func Route4(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
+	// Only GET Method Allowed
+	if r.Method != "GET" {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
 
 
 

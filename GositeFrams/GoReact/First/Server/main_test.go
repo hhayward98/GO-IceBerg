@@ -109,7 +109,7 @@ func TestRoute4(t *testing.T) {
 
 }
 
-func TestRouteP(t *testing.T) {
+func TestRoutePP(t *testing.T) {
 
 	res, err := http.Post("http://localhost:8080/RouteP", "application/json",  bytes.NewBuffer([]byte("{\"Message\": \"Test\"}")))
 	if err != nil {
@@ -121,6 +121,26 @@ func TestRouteP(t *testing.T) {
 	log.Println("response data: ",got)
 
 	want := `{"Message": "Post Method Only!", "Auth": "true"}`
+
+	if got != want {
+		t.Errorf("got %q, wanted %q", got , want)
+	}
+
+}
+
+
+func TestRoutePG(t *testing.T) {
+
+	res, err := http.Get("http://localhost:8080/RouteP")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	ByteBuffer, err := ioutil.ReadAll(res.Body)
+	got := string(ByteBuffer)
+	log.Println("response data: ",got)
+
+	want := `{"Message": "Method is Not Valid", "Auth": "false"}`
 
 	if got != want {
 		t.Errorf("got %q, wanted %q", got , want)
