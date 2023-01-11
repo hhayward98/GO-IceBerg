@@ -10,10 +10,13 @@ import (
 	"strings"
 	"net/http"
 	
-	// "io/fs"
-	// app "github.com/somthingTODO"
+	"io/fs"
+	app "github.com/pencil/react-go-embed"
 )
 
+
+
+// TODO: Use Docker to run app on Golang 1.18 
 
 var uiFS fs.FS
 
@@ -69,7 +72,7 @@ func handleStatic(w http.ResponseWriter, r *http.Request) {
 
 	contentType := mime.TypeByExtension(filepath.Ext(Fpath))
 	w.Header().Set("Content-Type", contentType)
-	if strings.HasPrefix(Fpath, "statix/") {
+	if strings.HasPrefix(Fpath, "static/") {
 		w.Header().Set("Cache-Control", "public, max-age=31536000")
 	}
 	stat, err := file.Stat()
